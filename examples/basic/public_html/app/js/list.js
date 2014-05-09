@@ -7,16 +7,11 @@
         debug = Saga.Debug,
         e = Saga.Dom.getById,
         u = Saga.Util,
-        list = Saga.List("/albatros/sites/question_admin/site/data/qs.php"),
+        list = Saga.List("data/list.json"),
         addClicks = function () {
             e("btnLoadList").onclick = function () {
                 list.load();
             };
-            /*
-            e("listContainer").innerHTML = asset.template({
-                users: App.Model.users()
-            });
-            */
         },
         loadList = function () {
             list.checkbox(true, function (row) {
