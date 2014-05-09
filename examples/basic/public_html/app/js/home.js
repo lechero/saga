@@ -11,7 +11,6 @@
         countdown = Saga.CountDown(endTime),
         startCountDown = function () {
             countdown.on("changed", function (timeLeft) {
-                //debug.log("countdown:changed", timeLeft);
                 d.elem("timeContainer").innerHTML = templateTimeLeft({
                     time: timeLeft
                 });
