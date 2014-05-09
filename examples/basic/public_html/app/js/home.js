@@ -31,4 +31,7 @@
         startCountDown();
         setButtonHandlers();
     });
+    Saga.AssetManager.on(asset.name + ":removed", function () {
+        countdown.stop();
+    });
 }(App.Assets.Home));
