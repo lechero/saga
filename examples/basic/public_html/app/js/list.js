@@ -29,10 +29,9 @@
             debug.log(asset.id + ".init()");
             div = e(asset.name);
             loadList();
-            if(cb){ // ok this need more epic
+            if(cb){ // ok this needs more epic
                 cb();
             }
-            //addClicks(); 
         },
         simpleInit;
 
