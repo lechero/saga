@@ -170,7 +170,7 @@ Saga.List = function (urlJson) {
 
         },
         template: function (model) {
-            return template(model);
+            return getTableTemplate()(model);
         },
         getTableTemplate: function () {
             return getTableTemplate();
