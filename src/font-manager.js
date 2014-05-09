@@ -42,8 +42,8 @@ Saga.FontManager = (function () {
             (function () {
                 var wf = document.createElement('script'),
                     s;
-                //wf.src = ('https:' === document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-                wf.src = 'libs/webfont.js';
+                wf.src = ('https:' === document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+                //wf.src = 'libs/webfont.js';
                 wf.type = 'text/javascript';
                 wf.async = 'true';
                 s = document.getElementsByTagName('script')[0];

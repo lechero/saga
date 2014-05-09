@@ -112,7 +112,8 @@ App.Manager = (function () {
             debug.levels(["log", "info", "error", "warn"]);
             debug.log("App.Manager.init()");
             Saga.AssetManager.on("inited", function () {
-                initComplete();
+                //initComplete();
+                loadFonts();
             });
             Saga.AssetManager.init(App.Assets);
 
@@ -218,10 +219,10 @@ App.SimpleView = function (asset) {
         div,
         debug = Saga.Debug,
         e = Saga.Dom.getById,
-        viewInit = function () {
+        viewInit = function (cb) {
             debug.log("SimpleView ->" + asset.id + ".init()");
             div = e(asset.name);
-            App.SimpleAnimation.genContentInit(div);
+            App.SimpleAnimation.genContentInit(div, cb);
         },
         viewShow = function (cb) {
             debug.log("SimpleView ->" + asset.id + ".show()");
@@ -236,8 +237,8 @@ App.SimpleView = function (asset) {
         };
 
     view = {
-        init: function () {
-            viewInit();
+        init: function (completeCallback) {
+            viewInit(completeCallback);
         },
         show: function (completeCallback) {
             viewShow(completeCallback);

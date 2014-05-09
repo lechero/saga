@@ -45,11 +45,14 @@
             });
             list.load();
         },
-        init = function () {
+        init = function (cb) {
             debug.log(asset.id + ".init()");
             div = e(asset.name);
             loadList();
-            //addClicks();
+            if(cb){ // ok this need more epic
+                cb();
+            }
+            //addClicks(); 
         },
         simpleInit;
 
