@@ -1,16 +1,6 @@
 /*jslint browser:true*/
 /*global App, Saga*/
 
-/*
-<ol>
-	<% _.each(users, function(user){ %> 
-	<li>
-		<%= user.id %> <%= user.first_name %> <%= user.last_name %>
-	</li>
-	<% }); %>
-</ol>
-*/
-
 (function (asset) {
     "use strict";
     var div,
@@ -37,11 +27,6 @@
                 Saga.Dom.elem("listContainer").innerHTML = list.template({
                     rows: list.data()
                 });
-                /*
-                Saga.Dom.elem("listContainer").innerHTML = u.template(list.getTableTemplate(), {
-                    rows: list.data()
-                });
-                */
             });
             list.load();
         },
