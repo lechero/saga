@@ -1,0 +1,25 @@
+#!/bin/bash
+echo "" > libs/saga.js
+cat ../../src/saga.js >> libs/saga.js
+cat ../../src/util.js >> libs/saga.js
+cat ../../src/debug.js >> libs/saga.js
+cat ../../src/event.js >> libs/saga.js
+cat ../../src/net.js >> libs/saga.js
+cat ../../src/dom.js >> libs/saga.js
+cat ../../src/browser.js >> libs/saga.js
+cat ../../src/holder.js >> libs/saga.js
+cat ../../src/asset.js >> libs/saga.js
+cat ../../src/route.js >> libs/saga.js
+cat ../../src/asset-manager.js >> libs/saga.js
+cat ../../src/font-manager.js >> libs/saga.js
+cat ../../src/keyboard.js >> libs/saga.js
+uglifyjs libs/saga.js -mc > libs/saga.tmp.js
+cat libs/underscore-min.js >  libs/saga-min.js
+echo "" >> libs/saga-min.js
+cat libs/saga.tmp.js >> libs/saga-min.js
+rm libs/saga.tmp.js
+cat libs/saga.js > libs/saga.tmp.js
+cat libs/underscore-min.js > libs/saga.js
+cat libs/saga.tmp.js >> libs/saga.js
+rm libs/saga.tmp.js
+
