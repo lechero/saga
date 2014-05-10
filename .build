@@ -1,4 +1,5 @@
 #!/bin/bash
+#Temporary build script
 echo "" > build/saga.js
 cat src/saga.js >> build/saga.js
 cat src/util.js >> build/saga.js
