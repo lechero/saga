@@ -1,3 +1,9 @@
+/*jslint browser:true*/
+/*global Saga */
+
+/****************************************
+** Just some stuff for the Milkman ... **
+****************************************/
 
 Saga.List = function (urlJson) {
     "use strict";

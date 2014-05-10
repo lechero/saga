@@ -11,7 +11,7 @@ Saga.Browser = (function () {
             exdate.setDate(exdate.getDate() + expiredays);
             document.cookie = c_name + "=" + escape(value) + ((expiredays === null) ? "" : "; expires=" + exdate.toGMTString()) + "; path=/";
         },
-        getCookie = function (c_name) {
+        getCookie = function (c_name) { // have to find who to credit for this
             if (document.cookie.length > 0) {
                 var c_start, c_end;
                 c_start = document.cookie.indexOf(c_name + "=");
