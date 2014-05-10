@@ -8,7 +8,7 @@
         setup = {
             Holders: { // you could define holders here, not mandatory
                 Menu: 'holderMenu',
-                Content: 'holderContent' // for pishti
+                Content: 'holderContent'
             },
             Assets: {
                 Home: {
@@ -43,14 +43,12 @@
             },
             Fonts: {
                 google: {
-                    //families: ['Droid Sans', 'Droid Serif', 'Aclonica', 'Acme', 'Alegreya']
                     families: ['Aclonica', 'Alegreya']
-                }
-                /*,
+                },
                 custom: {
-                    families: ["helveticaneue", "helveticaneue-light", "helveticaneue-bold"],
-                    urls: ["app/css/helveticaneue.css"]
-                }*/
+                    families: ["alpha_echoregular"],
+                    urls: ["app/css/alphaecho.css"]
+                }
             },
             Routes: {
                 'default': function () {
@@ -76,6 +74,29 @@
     });
 }.call(this));
 
+App.Preloader = (function () {
+    "use strict";
+    var pub,
+        debug = Saga.Debug,
+        loadFonts = function () {
+            Saga.FontManager.init(App.Fonts);
+            Saga.FontManager.once('loaded', function () {
+                debug.log("App.Manager.loadFonts() -> Saga.FontManager.on('loaded')");
+                startSite();
+            });
+            Saga.FontManager.load();
+        },
+        init = function () {
+
+        };
+
+    pub = {
+        init: function () {
+            init();
+        }
+    };
+    return pub;
+}.call(this));
 
 App.Manager = (function () {
     "use strict";

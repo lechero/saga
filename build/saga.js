@@ -49,49 +49,36 @@ Saga.Debug = (function () {
             var d = new Date();
             return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
         },
-        log = function () {
-            if (util.contains(activeLevels, 'log')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
+        output = function (type) {
+            if (util.contains(activeLevels, type)) {
+                var arg = Array.prototype.slice.call(arguments, 1);
                 arg.unshift(timestamp() + ": ");
                 try {
-                    console.log.apply(console, arg);
+                    console[type].apply(console, arg);
                 } catch (err) {
                     //console.log("Saga.Debug.log() -> catch", err);
                 }
             }
+        },
+        log = function () {
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('log');
+            output.apply(this, arg);
         },
         info = function () {
-            if (util.contains(activeLevels, 'info')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
-                arg.unshift(timestamp() + ": ");
-                try {
-                    console.info.apply(console, arg);
-                } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
-                }
-            }
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('info');
+            output.apply(this, arg);
         },
         error = function () {
-            if (util.contains(activeLevels, 'error')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
-                arg.unshift(timestamp() + ": ");
-                try {
-                    console.error.apply(console, arg);
-                } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
-                }
-            }
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('error');
+            output.apply(this, arg);
         },
         warn = function () {
-            if (util.contains(activeLevels, 'warn')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
-                arg.unshift(timestamp() + ": ");
-                try {
-                    console.warn.apply(console, arg);
-                } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
-                }
-            }
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('warn');
+            output.apply(this, arg);
         };
     pub = {
         log: function () {
@@ -253,33 +240,38 @@ Saga.net = (function () {
                 execute,
                 abort,
                 timeout,
-                abortHandler;
-            if (options) {
-                if (options.url) {
-                    url = options.url;
-                }
+                abortHandler,
+                initOptions = function (options) {
+                    if (options) {
+                        if (options.url) {
+                            url = options.url;
+                        }
 
-                if (options.success) {
-                    success = options.success;
-                }
-                if (options.error) {
-                    error = options.error;
-                }
-                if (options.abort) {
-                    abortHandler = options.abort;
-                }
-                if (options.timeout) {
-                    timeout = options.timeout;
-                }
-                if (options.data) {
-                    if (util.isString(options.data)) {
-                        data = options.data;
-                    } else {
-                        data = getUrlString(options.data);
+                        if (options.success) {
+                            success = options.success;
+                        }
+                        if (options.error) {
+                            error = options.error;
+                        }
+                        if (options.abort) {
+                            abortHandler = options.abort;
+                        }
+                        if (options.timeout) {
+                            timeout = options.timeout;
+                        }
+                        if (options.data) {
+                            if (util.isString(options.data)) {
+                                data = options.data;
+                            } else {
+                                data = getUrlString(options.data);
+                            }
+                        }
+                        method = options.method || "get";
                     }
-                }
-                method = options.method || "get";
-            }
+                };
+
+            initOptions(options);
+            
             xmlHttp = createXMLHttp(success, error);
 
             xmlHttp.onreadystatechange = function () {
@@ -290,13 +282,15 @@ Saga.net = (function () {
                         try {
                             response = JSON.parse(response);
                         } catch (er) {
-                            debug.warn("Saga.net.Loader -> Success, but couldn't parse JSON!", er);
+                            //ebug.warn("Saga.net.Loader -> Success, but couldn't parse JSON!", er);
                         }
+                        /*
                         debug.warn("Saga.net.Loader -> Success!", {
                             'duration': duration,
                             'state': xmlHttp.readyState,
                             'response': response
                         });
+                        */
                         if (success) {
                             success.call(null, xmlHttp.responseText);
                         }
@@ -306,9 +300,9 @@ Saga.net = (function () {
                             error.call(null, xmlHttp.responseText);
                         }
                     }
-                } else {
+                }/* else {
                     debug.warn("Saga.net.Loader -> state(" + xmlHttp.readyState + "/" + xmlHttp.status + ")");
-                }
+                }*/
             };
 
             xmlHttp.ontimeout = function () {
@@ -318,8 +312,9 @@ Saga.net = (function () {
                 }
             };
 
-            execute = function (params) {
-                debug.warn("Saga.net.Loader -> execute()", url, params);
+            execute = function (options) {
+                initOptions(options);
+                debug.warn("Saga.net.Loader -> execute()", url, options);
                 start = new Date().getTime();
                 xmlHttp.open(method, url, true);
                 if (String(method) === "post") {
@@ -339,8 +334,8 @@ Saga.net = (function () {
             };
 
             pub = {
-                execute: function () {
-                    execute();
+                execute: function (options) {
+                    execute(options);
                 },
                 abort: function () {
                     abort();
@@ -730,6 +725,17 @@ Saga.Holder = function (holderDivName) {
         divName = holderDivName,
         div = false,
         debug = Saga.Debug,
+        d = Saga.Dom,
+        place = function (newAsset) {
+            asset = newAsset;
+            debug.info("Saga.Holder.place()", newAsset);
+            div = document.getElementById(divName);
+            div.innerHTML = asset.Html();
+
+            d.head().appendChild(asset.Js());
+
+            return true;
+        },
         setAsset = function (newAsset) {
             asset = newAsset;
             div = document.getElementById(divName);
@@ -738,6 +744,9 @@ Saga.Holder = function (holderDivName) {
         };
 
     pub = {
+        place: function (asset) {
+            place(asset);
+        },
         asset: function () {
             return asset;
         },
@@ -746,6 +755,123 @@ Saga.Holder = function (holderDivName) {
         },
         setAsset: function (asset) {
             return setAsset(asset);
+        }
+    };
+    return pub;
+};/*jslint browser:true*/
+/*global Saga*/
+
+Saga.Asset = function (assetName, assetInfo) {
+    "use strict";
+    var pub,
+        debug = Saga.Debug,
+        u = Saga.Util,
+        name = assetName,
+        loaded = false,
+        view = {},
+        holder = false,
+        content = {},
+        // why?
+        html = false,
+        js = false,
+        template = false,
+        loadStack = [],
+        stackObj = function (type, file, prop) {
+            return {
+                'type': type,
+                'file': file,
+                'loaded': false,
+                'content': false,
+                'prop': prop
+            };
+        },
+        addLoad = function (type, obj) {
+            if (u.isString(obj)) {
+                content[type] = false;
+                loadStack.push(stackObj(type, obj, ""));
+            } else {
+                content[type] = {};
+                if (u.isArray(obj)) {
+                    content[type] = [];
+                }
+                u.each(obj, function (file, prop) {
+                    content[type][prop] = false;
+                    loadStack.push(stackObj(type, file, prop));
+                });
+            }
+        },
+        init = function (info) {
+            debug.info("Saga.Asset.init('" + name + "')", assetInfo);
+            if (!assetInfo.hasOwnProperty('files')) {
+                debug.error("Saga.Asset.init('" + name + "') -> No content found, exiting");
+                return;
+            }
+            if (!assetInfo.files.hasOwnProperty('js') && !assetInfo.files.hasOwnProperty('html')) {
+                debug.error("Saga.Asset.init('" + name + "') -> No Javascript or Html found, exiting");
+                return;
+            }
+            if (assetInfo.files.hasOwnProperty('html')) {
+                html = assetInfo.files.html;
+                addLoad('html', html);
+            }
+            if (assetInfo.files.hasOwnProperty('js')) {
+                js = assetInfo.files.js;
+                addLoad('js', js);
+            }
+            if (assetInfo.files.hasOwnProperty('template')) {
+                template = assetInfo.files.template;
+                addLoad('template', template);
+            }
+        },
+        loadComplete = function () {
+            u.each(loadStack, function (item) {
+                if (item.type === "template") {
+                    if (item.prop === "") {
+                        content.template = u.template(item.content);
+                    } else {
+                        content.template[item.prop] = u.template(item.content);
+                    }
+
+                } else {
+                    if (item.prop === "") {
+                        content[item.type] = item.content;
+                    } else {
+                        content[item.type][item.prop] = item.content;
+                    }
+                }
+            });
+            loaded = true;
+            //debug.info("Saga.Asset.loadComplete('" + name + "')", loaded, pub.loaded(), content, loadStack);
+        };
+
+    init(assetInfo);
+
+    pub = {
+        init: function (assetInfo) {
+            init(assetInfo);
+        },
+        loadStack: function () {
+            return loadStack;
+        },
+        loadComplete: function () {
+            loadComplete();
+        },
+        Template: function () {
+            return content.template;
+        },
+        Html: function () {
+            return content.html;
+        },
+        Js: function () {
+            return content.js;
+        },
+        View: view,
+        Holder: holder,
+        name: (function () {
+            return name;
+        }()),
+        loaded: function () {
+            return loaded;
         }
     };
     return pub;
@@ -820,28 +946,25 @@ Saga.AssetManager = (function () {
     "use strict";
     var pub,
         debug = Saga.Debug,
-        util = Saga.Util,
+        u = Saga.Util,
         dom = Saga.Dom,
-        assets = false,
         loader = Saga.net.Loader(),
+        assets = false,
         holders = {},
-        settings = function () {
-            return {
-                'loaded': false,
-                'view': false,
-                'js': [],
-                'html': [],
-                'template': false
-            };
-        },
-        getAssetHolder = function (asset) {
-            var holder = false;
-            if (holders.hasOwnProperty(asset.holder)) {
-                holder = holders[asset.holder];
+        loadStack = [],
+        loading = false,
+        currentStackAsset = false,
+        getHolder = function (name) {
+            //if (!asset.Holder) {
+            var holder;
+            if (!holders[name]) {
+                holders[name] = Saga.Holder(name);
             }
-            return holder;
+            return holders[name];
+            //}
         },
-        addJsFile = function (file, cb) {
+        loadJs = function (file, cb) {
+            //debug.info("Saga.AssetManager.loadJs() ", file);
             var script = document.createElement('script'),
                 done = false,
                 head = dom.head();
@@ -850,6 +973,7 @@ Saga.AssetManager = (function () {
                 if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
                     done = true;
                     script.onload = script.onreadystatechange = null;
+
                     if (head && script.parentNode) {
                         head.removeChild(script);
                     }
@@ -860,73 +984,117 @@ Saga.AssetManager = (function () {
             };
             script.src = file;
             head.appendChild(script);
-
             return script;
         },
         loadHtml = function (file, cb) {
-            var loader = new Saga.net.Loader({
+            var loadOptions = {
                 method: "get",
                 url: file,
                 success: function (result) {
                     if (cb) {
                         cb(result);
                     }
-                    loader = null;
                 }
-            });
-            loader.execute();
+            };
+            //debug.info("Saga.AssetManager.loadHtml() ", file, loadOptions);
+            loader.execute(loadOptions);
+        },
+        loadStackAsset = function (stackAsset) {
+            //debug.info("Saga.AssetManager.loadStackAsset() ", stackAsset);
+            var items = stackAsset.asset.loadStack(),
+                loadNextItem = function () {
+                    var item,
+                        itemsLeft = u.filter(items, function (item) {
+                            return !item.loaded;
+                        });
+                    //debug.info("Saga.AssetManager.loadStackAsset() -> loadNextItem()", items, " -> itemsLeft: ", itemsLeft);
+                    if (itemsLeft.length > 0) {
+                        item = itemsLeft[0];
+                        //debug.info("Saga.AssetManager.loadStackAsset() -> loadNextItem()", item, "!!!!! ");
+                        if (item.type === 'html' || item.type === 'template') {
+                            loadHtml(item.file, function (html) {
+                                item.loaded = true;
+                                item.content = html;
+                                loadNextItem();
+                            });
+                        }
+                        if (item.type === 'js') {
+                            loadJs(item.file, function (js) {
+                                item.loaded = true;
+                                item.content = js;
+                                loadNextItem();
+                            });
+                        }
+                    } else {
+                        stackAsset.cb();
+                    }
+                };
+            //debug.info("Saga.AssetManager.loadStackAsset() -> items ", items);
+            loadNextItem();
+        },
+        load = function () {
+            //debug.info("Saga.AssetManager.load() -> loadStack ", loadStack);
+            if (loading) {
+                debug.info("Saga.AssetManager.load() -> Already loading, waiting...", currentStackAsset);
+                return;
+            }
+            if (loadStack.length > 0) {
+                currentStackAsset = loadStack[0];
+                loadStack.shift();
+                //debug.info("Saga.AssetManager.load() -> loading ", currentStackAsset);
+                loadStackAsset(currentStackAsset);
+            }
         },
         loadAssetDone = function (asset, cb) {
-            asset.loaded = true;
+            asset.loadComplete();
             pub.fire(asset.name + ":loaded");
             if (cb) {
                 cb();
             }
         },
         loadAsset = function (asset, cb) {
-            asset.saga.js.push(addJsFile(asset.files.js, function () {
-                loadHtml(asset.files.html, function (html) {
-                    asset.saga.html.push(html);
-                    if (asset.files.hasOwnProperty('template')) { // No idea yet what to do with templates yet ( where to put them, load seperate or as collection etc bler, so assing a template to the asset root for njouw
-                        loadHtml(asset.files.template, function (html) {
-                            asset.saga.template = html;
-                            asset.template = util.template(html);
-                            loadAssetDone(asset, cb);
-                        });
-                    } else {
-                        loadAssetDone(asset, cb);
-                    }
-                });
-            }));
+            debug.info("Saga.AssetManager.loadAsset() -> ", asset);
+            if (asset.loaded()) {
+                loadAssetDone(asset, cb);
+                return;
+            }
+            loadStack.push({
+                'asset': asset,
+                'cb': function () {
+                    debug.info("Saga.AssetManager.loadAsset() -> Load Done ", asset);
+                    loadAssetDone(asset, cb);
+                }
+            });
+            load();
         },
         initAssets = function (assets) {
-            var asset;
-            for (asset in assets) {
-                if (assets.hasOwnProperty(asset)) {
-                    assets[asset].saga = util.clone(settings());
-                    assets[asset].name = asset;
-                    assets[asset].id = asset;
-                    assets[asset].View = {};
-                }
-            }
+            debug.info("Saga.AssetManager.initAssets() -> ", assets);
+            u.each(assets, function (assetInfo, name) {
+                u.extend(assetInfo, Saga.Asset(name, assetInfo));
+                assetInfo.Holder = getHolder(assetInfo.holder);
+            });
             pub.fire("inited");
         },
         init = function (projectAssets) {
-            debug.info("Saga.AssetManager.init -> ", projectAssets);
+            debug.info("Saga.AssetManager.init() -> ", projectAssets);
             assets = projectAssets;
             initAssets(assets);
         },
         remove = function (asset) {
+            debug.info("Saga.AssetManager.remove() -> ", asset);
             try {
                 asset.View.remove();
                 pub.fire(asset.name + ":removed");
             } catch (err) {
                 pub.fire(asset.name + ":removed");
-                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No REMOVE");
+                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
             }
+
+            asset.Js().parentNode.removeChild(asset.Js());
+            //dom.head().removeChild(); // to holder
         },
         hide = function (asset, cb) {
-            debug.info("Saga.AssetManager.hide -> ", asset);
+            debug.info("Saga.AssetManager.hide() -> ", asset);
             try {
                 asset.View.hide(function () {
                     pub.fire(asset.name + ":hidden");
@@ -945,7 +1113,40 @@ Saga.AssetManager = (function () {
             }
 
         },
+
         place = function (asset) {
+            debug.info("Saga.AssetManager.place -> ", asset.name, "in", asset.holder, asset.Holder);
+            if (!asset.loaded()) {
+                loadAsset(asset, function () {
+                    place(asset);
+                });
+                return;
+            }
+
+            if (!asset.Holder) {
+                /*if (!holders[asset.holder]) {
+                    holders[asset.holder] = Saga.Holder(asset.holder);
+                }*/
+                asset.Holder = getHolder(asset.holder); //holders[asset.holder];
+            }
+
+            asset.Holder.place(asset);
+            try {
+                asset.View.init();
+            } catch (er) {
+                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No INIT");
+            }
+            pub.fire(asset.name + ":inited");
+
+            try {
+                asset.View.show(function () {
+                    pub.fire(asset.name + ":shown");
+                });
+            } catch (err) {
+                pub.fire(asset.name + ":shown");
+                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No SHOW");
+            }
+            /*
             debug.info("Saga.AssetManager.place -> ", asset.id, "in", asset.holder);
             if (!asset.loaded) {
                 loadAsset(asset, function () {
@@ -975,9 +1176,20 @@ Saga.AssetManager = (function () {
                 pub.fire(asset.name + ":shown");
                 debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No SHOW");
             }
+            */
         },
         show = function (asset) {
-            debug.info("Saga.AssetManager.show -> ", asset);
+            debug.info("Saga.AssetManager.show -> ", asset, asset.Holder);
+
+            if (asset.Holder && asset.Holder.asset()) {
+                debug.info("Saga.AssetManager.show -> hiding", asset.Holder.asset());
+                hide(asset.Holder.asset(), function () {
+                    place(asset);
+                });
+            } else {
+                place(asset);
+            }
+            /*
             var holder = getAssetHolder(asset);
             if (holder && holder.asset()) {
                 debug.info("Saga.AssetManager.show -> hiding", holder.asset());
@@ -987,6 +1199,7 @@ Saga.AssetManager = (function () {
             } else {
                 place(asset);
             }
+            */
         };
 
     pub = {
@@ -1000,7 +1213,7 @@ Saga.AssetManager = (function () {
             return assets;
         }
     };
-    util.extend(pub, Saga.Event());
+    u.extend(pub, Saga.Event());
     return pub;
 }());/*jslint browser:true*/
 /*global Saga, WebFontConfig*/

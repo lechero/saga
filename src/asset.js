@@ -71,7 +71,6 @@ Saga.Asset = function (assetName, assetInfo) {
                     } else {
                         content.template[item.prop] = u.template(item.content);
                     }
-
                 } else {
                     if (item.prop === "") {
                         content[item.type] = item.content;
@@ -81,7 +80,6 @@ Saga.Asset = function (assetName, assetInfo) {
                 }
             });
             loaded = true;
-            //debug.info("Saga.Asset.loadComplete('" + name + "')", loaded, pub.loaded(), content, loadStack);
         };
 
     init(assetInfo);
