@@ -12,48 +12,52 @@ h1 {
 .hidden {
     display: none;
 }
-
+.box {
+    -webkit-box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.57);
+    -moz-box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.57);
+    box-shadow: 1px 1px 5px 1px rgba(0, 0, 0, 0.57);
+}
 /*
 Links 
 ---------------------------------------------------------------------------------------------------- */
 
 .btn-link {
-  font-weight: normal;
-  color: #428bca;
-  cursor: pointer;
-  border-radius: 0;
+    font-weight: normal;
+    color: #428bca;
+    cursor: pointer;
+    border-radius: 0;
 }
 .btn-link,
 .btn-link:active,
 .btn-link[disabled],
 fieldset[disabled] .btn-link {
-  background-color: transparent;
-  -webkit-box-shadow: none;
-          box-shadow: none;
+    background-color: transparent;
+    -webkit-box-shadow: none;
+    box-shadow: none;
 }
 .btn-link,
 .btn-link:hover,
 .btn-link:focus,
 .btn-link:active {
-  border-color: transparent;
+    border-color: transparent;
 }
 .btn-link:hover,
 .btn-link:focus {
-  color: #2a6496;
-  text-decoration: underline;
-  background-color: transparent;
+    color: #2a6496;
+    text-decoration: underline;
+    background-color: transparent;
 }
 .btn-link[disabled]:hover,
 fieldset[disabled] .btn-link:hover,
 .btn-link[disabled]:focus,
 fieldset[disabled] .btn-link:focus {
-  color: #999;
-  text-decoration: none;
+    color: #999;
+    text-decoration: none;
 }
-
 /*
 Buttons
 ---------------------------------------------------------------------------------------------------- */
+
 .btn {
     -moz-user-select: none;
     background-image: none;
@@ -100,7 +104,6 @@ Buttons
     border-color: #D43F3A;
     color: #FFFFFF;
 }
-
 .btn-default,
 .btn-primary,
 .btn-success,
@@ -255,7 +258,6 @@ Buttons
 /*
 Tables
 ---------------------------------------------------------------------------------------------------- */
-
 
 table {
     border-collapse: collapse;
