@@ -94,13 +94,15 @@ Saga.net = (function () {
                         try {
                             response = JSON.parse(response);
                         } catch (er) {
-                            debug.warn("Saga.net.Loader -> Success, but couldn't parse JSON!", er);
+                            //ebug.warn("Saga.net.Loader -> Success, but couldn't parse JSON!", er);
                         }
+                        /*
                         debug.warn("Saga.net.Loader -> Success!", {
                             'duration': duration,
                             'state': xmlHttp.readyState,
                             'response': response
                         });
+                        */
                         if (success) {
                             success.call(null, xmlHttp.responseText);
                         }
@@ -110,9 +112,9 @@ Saga.net = (function () {
                             error.call(null, xmlHttp.responseText);
                         }
                     }
-                } else {
+                }/* else {
                     debug.warn("Saga.net.Loader -> state(" + xmlHttp.readyState + "/" + xmlHttp.status + ")");
-                }
+                }*/
             };
 
             xmlHttp.ontimeout = function () {

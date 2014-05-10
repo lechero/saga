@@ -65,7 +65,6 @@ Saga.Asset = function (assetName, assetInfo) {
         },
         loadComplete = function () {
             u.each(loadStack, function (item) {
-                debug.log("loadComplete", item);
                 if (item.type === "template") {
                     if (item.prop === "") {
                         content.template = u.template(item.content);
@@ -75,7 +74,6 @@ Saga.Asset = function (assetName, assetInfo) {
 
                 } else {
                     if (item.prop === "") {
-                        debug.log("SET STRING", item.content, item.type, content);
                         content[item.type] = item.content;
                     } else {
                         content[item.type][item.prop] = item.content;
@@ -83,8 +81,7 @@ Saga.Asset = function (assetName, assetInfo) {
                 }
             });
             loaded = true;
-            debug.info("Saga.Asset.loadComplete('" + name + "')", loaded, pub.loaded(), content, loadStack);
-
+            //debug.info("Saga.Asset.loadComplete('" + name + "')", loaded, pub.loaded(), content, loadStack);
         };
 
     init(assetInfo);
