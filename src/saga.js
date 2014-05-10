@@ -4,7 +4,7 @@
 var Saga = (function () {
     "use strict";
     var version = "@VERSION",
-        sagaId = "saga",
+        id = "saga",
         doc = document,
         vars = false,
         pub = {
@@ -13,7 +13,7 @@ var Saga = (function () {
             }())
         };
     try {
-        JSON.parse(doc.getElementById(sagaId).innerHTML);
+        JSON.parse(doc.getElementById(id).innerHTML);
     } catch (err) {
         vars = "NOT_SET";
     }
