@@ -257,6 +257,7 @@ Buttons
     background-color: #c12e2a;
     border-color: #b92c28
 }
+
 /*
 Tables
 ---------------------------------------------------------------------------------------------------- */
@@ -303,3 +304,57 @@ table {
     padding: 8px;
     vertical-align: top;
 }
+
+/*
+Labels
+---------------------------------------------------------------------------------------------------- */
+.label {
+    border-radius: 0.25em;
+    color: #FFFFFF;
+    display: inline;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.2em 0.6em 0.3em;
+    text-align: center;
+    vertical-align: baseline;
+    white-space: nowrap;
+}
+
+.label-default {
+    background-color: #999999;
+}
+.label-default[href]:hover, .label-default[href]:focus {
+    background-color: #808080;
+}
+.label-primary {
+    background-color: #428BCA;
+}
+.label-primary[href]:hover, .label-primary[href]:focus {
+    background-color: #3071A9;
+}
+.label-success {
+    background-color: #5CB85C;
+}
+.label-success[href]:hover, .label-success[href]:focus {
+    background-color: #449D44;
+}
+.label-info {
+    background-color: #5BC0DE;
+}
+.label-info[href]:hover, .label-info[href]:focus {
+    background-color: #31B0D5;
+}
+.label-warning {
+    background-color: #F0AD4E;
+}
+.label-warning[href]:hover, .label-warning[href]:focus {
+    background-color: #EC971F;
+}
+.label-danger {
+    background-color: #D9534F;
+}
+.label-danger[href]:hover, .label-danger[href]:focus {
+    background-color: #C9302C;
+}
+
