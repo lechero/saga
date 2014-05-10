@@ -12,8 +12,6 @@
             },
             Assets: {
                 Home: {
-                    name: 'home',
-                    id: 'Site.view.Home',
                     files: {
                         html: 'app/html/home.html',
                         js: 'app/js/home.js'
@@ -21,8 +19,6 @@
                     holder: 'holderContent'
                 },
                 About: {
-                    name: 'about',
-                    id: 'Site.view.About',
                     files: {
                         html: 'app/html/about.html',
                         js: 'app/js/about.js'
@@ -30,8 +26,6 @@
                     holder: 'holderContent'
                 },
                 List: {
-                    name: 'list',
-                    id: 'Site.view.List',
                     files: {
                         html: 'app/html/list.html',
                         js: 'app/js/list.js',
@@ -40,8 +34,6 @@
                     holder: 'holderContent'
                 },
                 Menu: {
-                    name: 'menu',
-                    id: 'Site.view.Menu',
                     files: {
                         html: 'app/html/menu.html',
                         js: 'app/js/menu.js'
@@ -91,7 +83,7 @@ App.Manager = (function () {
         debug = Saga.Debug,
         keyboard = Saga.Keyboard,
         startSite = function () {
-            Saga.AssetManager.once("menu:shown", function () {
+            Saga.AssetManager.once("Menu:shown", function () {
                 Saga.Route.init(App.Routes);
             });
             Saga.AssetManager.show(App.Assets.Menu);

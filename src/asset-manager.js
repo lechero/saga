@@ -89,6 +89,8 @@ Saga.AssetManager = (function () {
             for (asset in assets) {
                 if (assets.hasOwnProperty(asset)) {
                     assets[asset].saga = util.clone(settings());
+                    assets[asset].name = asset;
+                    assets[asset].id = asset;
                     assets[asset].View = {};
                 }
             }

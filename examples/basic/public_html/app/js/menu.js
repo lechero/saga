@@ -8,13 +8,13 @@
         e = Saga.Dom.getById,
         setButtonHandlers = function () {
             e('btnHome').onclick = function () {
-                Saga.Route.showPage(App.Assets.Home.name);
+                Saga.Route.showPage("home");
             };
             e('btnAbout').onclick = function () {
-                Saga.Route.showPage(App.Assets.About.name);
+                Saga.Route.showPage("about");
             };
             e('btnList').onclick = function () {
-                Saga.Route.showPage(App.Assets.List.name);
+                Saga.Route.showPage("list");
             };
         },
         init = function () {
