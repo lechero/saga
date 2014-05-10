@@ -4,20 +4,27 @@
 
 var Saga = (function () {
     "use strict";
-    var version = "@VERSION",
+    var pub,
+        version = "@VERSION",
         id = "saga",
-        doc = document,
+        doc = document || false,
         vars = false,
-        pub = {
-            vars: (function () {
-                return vars;
-            }())
+        init = function () {
+            try {
+                JSON.parse(doc.getElementById(id).innerHTML);
+            } catch (err) {
+                vars = "NOT_SET";
+            }
         };
-    try {
-        JSON.parse(doc.getElementById(id).innerHTML);
-    } catch (err) {
-        vars = "NOT_SET";
-    }
+
+    pub = {
+        vars: (function () {
+            return vars;
+        }())
+    };
+
+    init();
+
     return pub;
 }());/*jslint browser:true*/
 /*global Saga, console, _ */
