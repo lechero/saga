@@ -26,10 +26,10 @@
             list.load();
         },
         init = function (cb) {
-            debug.log(asset.id + ".init()");
+            debug.log(asset.name + ".init()");
             div = e(asset.name);
             loadList();
-            if(cb){ // ok this needs more epic
+            if (cb) { // ok this needs more epic
                 cb();
             }
         },

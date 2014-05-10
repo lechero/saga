@@ -1,12 +1,25 @@
 {
-  "name": "my-project-name",
-  "version": "0.1.0",
-  "devDependencies": {
-    "grunt": "~0.4.4",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-nodeunit": "~0.3.3",
-    "grunt-contrib-uglify": "~0.4.0",
-    "grunt-contrib-concat": "~0.4.0",
-    "grunt-contrib-compass": "~0.7.2"
-  }
+    "name": "SagaJS",
+    "version": "0.1.0",
+    "title": "Saga - Js - Javascript Framework",
+    "description": "Javascript Framework, Utils, preload assets/content, show hide assets, ajax loader, dom functions, routing and much more!",
+    "author": "Lecherp lechero@sagajs.com (https://github.com/lechero/)",
+    "license": "MIT",
+    "categories": "framework",
+    "keywords": [
+        "util",
+        "routing",
+        "dom",
+        "assets",
+        "loading",
+        "rapid development"
+    ]
+    "devDependencies": {
+        "grunt": "~0.4.4",
+        "grunt-contrib-jshint": "~0.10.0",
+        "grunt-contrib-nodeunit": "~0.3.3",
+        "grunt-contrib-uglify": "~0.4.0",
+        "grunt-contrib-concat": "~0.4.0",
+        "grunt-contrib-compass": "~0.7.2"
+    }
 }

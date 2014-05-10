@@ -12,6 +12,21 @@ module.exports = function (grunt) {
                 src: 'src/<%= pkg.name %>.js',
                 dest: 'build/<%= pkg.name %>.min.js'
             }
+        },
+        compass: { // Task
+            dist: { // Target
+                options: { // Target options
+                    sassDir: 'sass',
+                    cssDir: 'css',
+                    environment: 'production'
+                }
+            },
+            dev: { // Another target
+                options: {
+                    sassDir: 'sass',
+                    cssDir: 'css'
+                }
+            }
         }
     });
 
@@ -19,6 +34,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Default task(s).
-    grunt.registerTask('default', ['uglify']);
+    //grunt.registerTask('default', ['uglify']);
+    grunt.registerTask('default', ['compass']);
 
 };

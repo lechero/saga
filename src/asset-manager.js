@@ -78,28 +78,34 @@ Saga.AssetManager = (function () {
                             });
                         }
                     } else {
-                        stackAsset.cb();
+                        stackAsset.done();
                     }
                 };
             loadNextItem();
         },
         load = function () {
+            debug.info("Saga.AssetManager.load() -> loading: ", loading);
             if (loading) {
                 debug.info("Saga.AssetManager.load() -> Already loading, waiting...", currentStackAsset);
                 return;
             }
             if (loadStack.length > 0) {
+                loading = true;
                 currentStackAsset = loadStack[0];
                 loadStack.shift();
                 loadStackAsset(currentStackAsset);
+            }else{
+                debug.info("Saga.AssetManager.load() -> Nothing else to load");
             }
         },
         loadAssetDone = function (asset, cb) {
+            loading = false;
             asset.loadComplete();
             pub.fire(asset.name + ":loaded");
             if (cb) {
                 cb();
             }
+            load();
         },
         loadAsset = function (asset, cb) {
             debug.info("Saga.AssetManager.loadAsset() -> ", asset);
@@ -109,7 +115,7 @@ Saga.AssetManager = (function () {
             }
             loadStack.push({
                 'asset': asset,
-                'cb': function () {
+                'done': function () {
                     debug.info("Saga.AssetManager.loadAsset() -> Load Done ", asset);
                     loadAssetDone(asset, cb);
                 }
