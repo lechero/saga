@@ -8,7 +8,7 @@
         setup = {
             Holders: { // you could define holders here, not mandatory
                 Menu: 'holderMenu',
-                Content: 'holderContent' // for pishti
+                Content: 'holderContent'
             },
             Assets: {
                 Home: {
@@ -43,14 +43,12 @@
             },
             Fonts: {
                 google: {
-                    //families: ['Droid Sans', 'Droid Serif', 'Aclonica', 'Acme', 'Alegreya']
                     families: ['Aclonica', 'Alegreya']
-                }
-                /*,
+                },
                 custom: {
-                    families: ["helveticaneue", "helveticaneue-light", "helveticaneue-bold"],
-                    urls: ["app/css/helveticaneue.css"]
-                }*/
+                    families: ["alpha_echoregular"],
+                    urls: ["app/css/alphaecho.css"]
+                }
             },
             Routes: {
                 'default': function () {
@@ -76,6 +74,29 @@
     });
 }.call(this));
 
+App.Preloader = (function () {
+    "use strict";
+    var pub,
+        debug = Saga.Debug,
+        loadFonts = function () {
+            Saga.FontManager.init(App.Fonts);
+            Saga.FontManager.once('loaded', function () {
+                debug.log("App.Manager.loadFonts() -> Saga.FontManager.on('loaded')");
+                startSite();
+            });
+            Saga.FontManager.load();
+        },
+        init = function () {
+
+        };
+
+    pub = {
+        init: function () {
+            init();
+        }
+    };
+    return pub;
+}.call(this));
 
 App.Manager = (function () {
     "use strict";
@@ -212,20 +233,20 @@ App.SimpleView = function (asset) {
         debug = Saga.Debug,
         e = Saga.Dom.getById,
         viewInit = function (cb) {
-            debug.log("SimpleView ->" + asset.id + ".init()");
+            debug.log("SimpleView ->" + asset.name + ".init()");
             div = e(asset.name);
             App.SimpleAnimation.genContentInit(div, cb);
         },
         viewShow = function (cb) {
-            debug.log("SimpleView ->" + asset.id + ".show()");
+            debug.log("SimpleView ->" + asset.name + ".show()");
             App.SimpleAnimation.genContentShow(div, cb);
         },
         viewHide = function (cb) {
-            debug.log("SimpleView ->" + asset.id + ".hide()");
+            debug.log("SimpleView ->" + asset.name + ".hide()");
             App.SimpleAnimation.genContentHide(div, cb);
         },
         viewRemove = function () {
-            debug.log("SimpleView ->" + asset.id + ".remove()");
+            debug.log("SimpleView ->" + asset.name + ".remove()");
         };
 
     view = {

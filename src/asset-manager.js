@@ -5,28 +5,22 @@ Saga.AssetManager = (function () {
     "use strict";
     var pub,
         debug = Saga.Debug,
-        util = Saga.Util,
+        u = Saga.Util,
         dom = Saga.Dom,
-        assets = false,
         loader = Saga.net.Loader(),
+        assets = false,
         holders = {},
-        settings = function () {
-            return {
-                'loaded': false,
-                'view': false,
-                'js': [],
-                'html': [],
-                'template': false
-            };
-        },
-        getAssetHolder = function (asset) {
-            var holder = false;
-            if (holders.hasOwnProperty(asset.holder)) {
-                holder = holders[asset.holder];
+        loadStack = [],
+        loading = false,
+        currentStackAsset = false,
+        getHolder = function (name) {
+            var holder;
+            if (!holders[name]) {
+                holders[name] = Saga.Holder(name);
             }
-            return holder;
+            return holders[name];
         },
-        addJsFile = function (file, cb) {
+        loadJs = function (file, cb) {
             var script = document.createElement('script'),
                 done = false,
                 head = dom.head();
@@ -35,6 +29,7 @@ Saga.AssetManager = (function () {
                 if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
                     done = true;
                     script.onload = script.onreadystatechange = null;
+
                     if (head && script.parentNode) {
                         head.removeChild(script);
                     }
@@ -45,73 +40,114 @@ Saga.AssetManager = (function () {
             };
             script.src = file;
             head.appendChild(script);
-
             return script;
         },
         loadHtml = function (file, cb) {
-            var loader = new Saga.net.Loader({
+            var loadOptions = {
                 method: "get",
                 url: file,
                 success: function (result) {
                     if (cb) {
                         cb(result);
                     }
-                    loader = null;
                 }
-            });
-            loader.execute();
+            };
+            loader.execute(loadOptions);
+        },
+        loadStackAsset = function (stackAsset) {
+            var items = stackAsset.asset.loadStack(),
+                loadNextItem = function () {
+                    var item,
+                        itemsLeft = u.filter(items, function (item) {
+                            return !item.loaded;
+                        });
+                    if (itemsLeft.length > 0) {
+                        item = itemsLeft[0];
+                        if (item.type === 'html' || item.type === 'template') {
+                            loadHtml(item.file, function (html) {
+                                item.loaded = true;
+                                item.content = html;
+                                loadNextItem();
+                            });
+                        }
+                        if (item.type === 'js') {
+                            loadJs(item.file, function (js) {
+                                item.loaded = true;
+                                item.content = js;
+                                loadNextItem();
+                            });
+                        }
+                    } else {
+                        stackAsset.cb();
+                    }
+                };
+            loadNextItem();
+        },
+        load = function () {
+            if (loading) {
+                debug.info("Saga.AssetManager.load() -> Already loading, waiting...", currentStackAsset);
+                return;
+            }
+            if (loadStack.length > 0) {
+                currentStackAsset = loadStack[0];
+                loadStack.shift();
+                loadStackAsset(currentStackAsset);
+            }
         },
         loadAssetDone = function (asset, cb) {
-            asset.loaded = true;
+            asset.loadComplete();
             pub.fire(asset.name + ":loaded");
             if (cb) {
                 cb();
             }
         },
         loadAsset = function (asset, cb) {
-            asset.saga.js.push(addJsFile(asset.files.js, function () {
-                loadHtml(asset.files.html, function (html) {
-                    asset.saga.html.push(html);
-                    if (asset.files.hasOwnProperty('template')) { // No idea yet what to do with templates yet ( where to put them, load seperate or as collection etc bler, so assing a template to the asset root for njouw
-                        loadHtml(asset.files.template, function (html) {
-                            asset.saga.template = html;
-                            asset.template = util.template(html);
-                            loadAssetDone(asset, cb);
-                        });
-                    } else {
-                        loadAssetDone(asset, cb);
-                    }
-                });
-            }));
+            debug.info("Saga.AssetManager.loadAsset() -> ", asset);
+            if (asset.loaded()) {
+                loadAssetDone(asset, cb);
+                return;
+            }
+            loadStack.push({
+                'asset': asset,
+                'cb': function () {
+                    debug.info("Saga.AssetManager.loadAsset() -> Load Done ", asset);
+                    loadAssetDone(asset, cb);
+                }
+            });
+            load();
         },
         initAssets = function (assets) {
-            var asset;
-            for (asset in assets) {
-                if (assets.hasOwnProperty(asset)) {
-                    assets[asset].saga = util.clone(settings());
-                    assets[asset].name = asset;
-                    assets[asset].id = asset;
-                    assets[asset].View = {};
-                }
-            }
+            debug.info("Saga.AssetManager.initAssets() -> ", assets);
+            u.each(assets, function (assetInfo, name) {
+                u.extend(assetInfo, Saga.Asset(name, assetInfo));
+                assetInfo.Holder = getHolder(assetInfo.holder);
+            });
             pub.fire("inited");
         },
-        init = function (projectAssets) {
-            debug.info("Saga.AssetManager.init -> ", projectAssets);
+        init = function (projectAssets, holders) {
+            debug.info("Saga.AssetManager.init() -> ", projectAssets);
+            if (holders) {
+                u.each(holders, function (holder, name) {
+                    holders[holder] = getHolder(holder);
+                    holders[name] = holders[holder]; // So The holder can be referenced with the given name
+                });
+            }
             assets = projectAssets;
             initAssets(assets);
         },
         remove = function (asset) {
+            debug.info("Saga.AssetManager.remove() -> ", asset);
             try {
                 asset.View.remove();
                 pub.fire(asset.name + ":removed");
             } catch (err) {
                 pub.fire(asset.name + ":removed");
-                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No REMOVE");
+                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
             }
+            asset.Js().parentNode.removeChild(asset.Js());
         },
         hide = function (asset, cb) {
-            debug.info("Saga.AssetManager.hide -> ", asset);
+            debug.info("Saga.AssetManager.hide() -> ", asset);
             try {
                 asset.View.hide(function () {
                     pub.fire(asset.name + ":hidden");
@@ -128,23 +164,20 @@ Saga.AssetManager = (function () {
                 }
                 debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No HIDE");
             }
-
         },
         place = function (asset) {
-            debug.info("Saga.AssetManager.place -> ", asset.id, "in", asset.holder);
-            if (!asset.loaded) {
+            debug.info("Saga.AssetManager.place -> ", asset.name, "in", asset.holder, asset.Holder);
+            if (!asset.loaded()) {
                 loadAsset(asset, function () {
                     place(asset);
                 });
                 return;
             }
-            var holder = getAssetHolder(asset);
-            if (!holder) {
-                holders[asset.holder] = Saga.Holder(asset.holder);
-                holder = holders[asset.holder];
+            if (!asset.Holder) {
+                asset.Holder = getHolder(asset.holder);
             }
-            holder.setAsset(asset);
 
+            asset.Holder.place(asset);
             try {
                 asset.View.init();
             } catch (er) {
@@ -162,11 +195,11 @@ Saga.AssetManager = (function () {
             }
         },
         show = function (asset) {
-            debug.info("Saga.AssetManager.show -> ", asset);
-            var holder = getAssetHolder(asset);
-            if (holder && holder.asset()) {
-                debug.info("Saga.AssetManager.show -> hiding", holder.asset());
-                hide(holder.asset(), function () {
+            debug.info("Saga.AssetManager.show -> ", asset, asset.Holder);
+
+            if (asset.Holder && asset.Holder.asset()) {
+                debug.info("Saga.AssetManager.show -> hiding", asset.Holder.asset());
+                hide(asset.Holder.asset(), function () {
                     place(asset);
                 });
             } else {
@@ -185,6 +218,6 @@ Saga.AssetManager = (function () {
             return assets;
         }
     };
-    util.extend(pub, Saga.Event());
+    u.extend(pub, Saga.Event());
     return pub;
 }());

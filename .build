@@ -24,5 +24,5 @@ echo "" >> build/saga-min.js
 cat build/saga.tmp.js >> build/saga-min.js
 rm build/saga.tmp.js
 
-cp build/saga.js examples/basic/public_html/app/libs/saga.js
-cp build/saga-min.js examples/basic/public_html/app/libs/saga-min.js
+cp build/saga.js example/public_html/app/libs/saga.js
+cp build/saga-min.js example/public_html/app/libs/saga-min.js

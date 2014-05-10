@@ -52,33 +52,38 @@ Saga.net = (function () {
                 execute,
                 abort,
                 timeout,
-                abortHandler;
-            if (options) {
-                if (options.url) {
-                    url = options.url;
-                }
+                abortHandler,
+                initOptions = function (options) {
+                    if (options) {
+                        if (options.url) {
+                            url = options.url;
+                        }
 
-                if (options.success) {
-                    success = options.success;
-                }
-                if (options.error) {
-                    error = options.error;
-                }
-                if (options.abort) {
-                    abortHandler = options.abort;
-                }
-                if (options.timeout) {
-                    timeout = options.timeout;
-                }
-                if (options.data) {
-                    if (util.isString(options.data)) {
-                        data = options.data;
-                    } else {
-                        data = getUrlString(options.data);
+                        if (options.success) {
+                            success = options.success;
+                        }
+                        if (options.error) {
+                            error = options.error;
+                        }
+                        if (options.abort) {
+                            abortHandler = options.abort;
+                        }
+                        if (options.timeout) {
+                            timeout = options.timeout;
+                        }
+                        if (options.data) {
+                            if (util.isString(options.data)) {
+                                data = options.data;
+                            } else {
+                                data = getUrlString(options.data);
+                            }
+                        }
+                        method = options.method || "get";
                     }
-                }
-                method = options.method || "get";
-            }
+                };
+
+            initOptions(options);
+            
             xmlHttp = createXMLHttp(success, error);
 
             xmlHttp.onreadystatechange = function () {
@@ -89,13 +94,15 @@ Saga.net = (function () {
                         try {
                             response = JSON.parse(response);
                         } catch (er) {
-                            debug.warn("Saga.net.Loader -> Success, but couldn't parse JSON!", er);
+                            //ebug.warn("Saga.net.Loader -> Success, but couldn't parse JSON!", er);
                         }
+                        /*
                         debug.warn("Saga.net.Loader -> Success!", {
                             'duration': duration,
                             'state': xmlHttp.readyState,
                             'response': response
                         });
+                        */
                         if (success) {
                             success.call(null, xmlHttp.responseText);
                         }
@@ -105,9 +112,9 @@ Saga.net = (function () {
                             error.call(null, xmlHttp.responseText);
                         }
                     }
-                } else {
+                }/* else {
                     debug.warn("Saga.net.Loader -> state(" + xmlHttp.readyState + "/" + xmlHttp.status + ")");
-                }
+                }*/
             };
 
             xmlHttp.ontimeout = function () {
@@ -117,8 +124,9 @@ Saga.net = (function () {
                 }
             };
 
-            execute = function (params) {
-                debug.warn("Saga.net.Loader -> execute()", url, params);
+            execute = function (options) {
+                initOptions(options);
+                debug.warn("Saga.net.Loader -> execute()", url, options);
                 start = new Date().getTime();
                 xmlHttp.open(method, url, true);
                 if (String(method) === "post") {
@@ -138,8 +146,8 @@ Saga.net = (function () {
             };
 
             pub = {
-                execute: function () {
-                    execute();
+                execute: function (options) {
+                    execute(options);
                 },
                 abort: function () {
                     abort();

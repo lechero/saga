@@ -11,49 +11,36 @@ Saga.Debug = (function () {
             var d = new Date();
             return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
         },
-        log = function () {
-            if (util.contains(activeLevels, 'log')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
+        output = function (type) {
+            if (util.contains(activeLevels, type)) {
+                var arg = Array.prototype.slice.call(arguments, 1);
                 arg.unshift(timestamp() + ": ");
                 try {
-                    console.log.apply(console, arg);
+                    console[type].apply(console, arg);
                 } catch (err) {
                     //console.log("Saga.Debug.log() -> catch", err);
                 }
             }
+        },
+        log = function () {
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('log');
+            output.apply(this, arg);
         },
         info = function () {
-            if (util.contains(activeLevels, 'info')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
-                arg.unshift(timestamp() + ": ");
-                try {
-                    console.info.apply(console, arg);
-                } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
-                }
-            }
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('info');
+            output.apply(this, arg);
         },
         error = function () {
-            if (util.contains(activeLevels, 'error')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
-                arg.unshift(timestamp() + ": ");
-                try {
-                    console.error.apply(console, arg);
-                } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
-                }
-            }
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('error');
+            output.apply(this, arg);
         },
         warn = function () {
-            if (util.contains(activeLevels, 'warn')) {
-                var arg = Array.prototype.slice.call(arguments, 0);
-                arg.unshift(timestamp() + ": ");
-                try {
-                    console.warn.apply(console, arg);
-                } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
-                }
-            }
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('warn');
+            output.apply(this, arg);
         };
     pub = {
         log: function () {

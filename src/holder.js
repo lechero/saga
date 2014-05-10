@@ -8,6 +8,17 @@ Saga.Holder = function (holderDivName) {
         divName = holderDivName,
         div = false,
         debug = Saga.Debug,
+        d = Saga.Dom,
+        place = function (newAsset) {
+            asset = newAsset;
+            debug.info("Saga.Holder.place()", newAsset);
+            div = document.getElementById(divName);
+            div.innerHTML = asset.Html();
+
+            d.head().appendChild(asset.Js());
+
+            return true;
+        },
         setAsset = function (newAsset) {
             asset = newAsset;
             div = document.getElementById(divName);
@@ -16,6 +27,9 @@ Saga.Holder = function (holderDivName) {
         };
 
     pub = {
+        place: function (asset) {
+            place(asset);
+        },
         asset: function () {
             return asset;
         },
