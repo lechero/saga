@@ -11,10 +11,7 @@ Saga.Asset = function (assetName, assetInfo) {
         view = {},
         holder = false,
         content = {},
-        // why?
-        html = false,
-        js = false,
-        template = false,
+       
         loadStack = [],
         stackObj = function (type, file, prop) {
             return {
@@ -51,16 +48,13 @@ Saga.Asset = function (assetName, assetInfo) {
                 return;
             }
             if (assetInfo.files.hasOwnProperty('html')) {
-                html = assetInfo.files.html;
-                addLoad('html', html);
+                addLoad('html', assetInfo.files.html);
             }
             if (assetInfo.files.hasOwnProperty('js')) {
-                js = assetInfo.files.js;
-                addLoad('js', js);
+                addLoad('js', assetInfo.files.js);
             }
             if (assetInfo.files.hasOwnProperty('template')) {
-                template = assetInfo.files.template;
-                addLoad('template', template);
+                addLoad('template', assetInfo.files.template);
             }
         },
         loadComplete = function () {
