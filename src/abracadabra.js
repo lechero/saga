@@ -148,17 +148,6 @@ Saga.List = function (urlJson) {
             }
         },
         select: function (hasSelect, headerHandler) {
-            // has a select
-            /*
-            if (hasSelect) {
-                settings.select = Boolean(hasSelect);
-                if (hasSelect && headerHandler) {
-                    settings.headerHandler = headerHandler;
-                }
-            } else {
-                return settings.select;
-            }
-            */
         },
         selectedItems: function () {
 
