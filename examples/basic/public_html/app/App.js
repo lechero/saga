@@ -134,15 +134,15 @@ App.Model = (function () {
         users = [
             {
                 "id": 1,
-                "name": "Miguel Fuentes",
-                "first_name": "Miguel",
-                "last_name": "Fuentes"
+                "name": "Lecherito Fuentastico",
+                "first_name": "Lecherito",
+                "last_name": "Fuentastico"
             },
             {
                 "id": 2,
-                "name": "Marcelo Fuentes",
-                "first_name": "Marcelo",
-                "last_name": "Fuentes"
+                "name": "Caballero Condorito",
+                "first_name": "Caballero",
+                "last_name": "Condorito"
             }
         ];
 

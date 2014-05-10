@@ -49,7 +49,7 @@ Saga.Debug = (function () {
                 try {
                     console.log.apply(console, arg);
                 } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
+                    //
                 }
             }
         },
@@ -60,7 +60,7 @@ Saga.Debug = (function () {
                 try {
                     console.info.apply(console, arg);
                 } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
+                    //
                 }
             }
         },
@@ -71,7 +71,7 @@ Saga.Debug = (function () {
                 try {
                     console.error.apply(console, arg);
                 } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
+                    //
                 }
             }
         },
@@ -82,7 +82,7 @@ Saga.Debug = (function () {
                 try {
                     console.warn.apply(console, arg);
                 } catch (err) {
-                    //console.log("Saga.Debug.log() -> catch", err);
+                    //
                 }
             }
         };
@@ -688,7 +688,7 @@ Saga.Browser = (function () {
             exdate.setDate(exdate.getDate() + expiredays);
             document.cookie = c_name + "=" + escape(value) + ((expiredays === null) ? "" : "; expires=" + exdate.toGMTString()) + "; path=/";
         },
-        getCookie = function (c_name) { // have to find who to credit for this
+        getCookie = function (c_name) {
             if (document.cookie.length > 0) {
                 var c_start, c_end;
                 c_start = document.cookie.indexOf(c_name + "=");
@@ -1155,13 +1155,7 @@ Saga.Keyboard = (function () {
     util.extend(pub, Saga.Event());
 
     return pub;
-}());/*jslint browser:true*/
-/*global Saga */
-
-/****************************************
-** Just some stuff for the Milkman ... **
-****************************************/
-
+}());
 Saga.List = function (urlJson) {
     "use strict";
     var pub,

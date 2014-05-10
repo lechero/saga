@@ -15,8 +15,9 @@ cat src/font-manager.js >> build/saga.js
 cat src/image.js >> build/saga.js
 cat src/keyboard.js >> build/saga.js
 cat src/abracadabra.js >> build/saga.js
-
-uglifyjs build/saga.js -mc > build/saga.tmp.js
+sed -E 's/debug.(log|warn|debug|info|warn|error)\(((.|\n|\t)*)\);?//g' < build/saga.js > build/sagab.js
+uglifyjs build/sagab.js -mc > build/saga.tmp.js
+rm build/sagab.js
 cat src/libs/underscore-min.js >  build/saga-min.js
 echo "" >> build/saga-min.js
 cat build/saga.tmp.js >> build/saga-min.js
