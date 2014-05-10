@@ -8,4 +8,4 @@ lechero@sagajs.com
 
 https://twitter.com/Saga_JS
 
-sagajs.com
+http://sagajs.com
