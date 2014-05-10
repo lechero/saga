@@ -18,7 +18,7 @@
             };
         },
         init = function () {
-            debug.log(asset.id + ".init()");
+            debug.log(asset.name + ".init()");
             div = e(asset.name);
             setButtonHandlers();
             e('menuHeader').innerHTML = 'Saga (' + e('saga').src + ')';

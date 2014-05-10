@@ -212,20 +212,20 @@ App.SimpleView = function (asset) {
         debug = Saga.Debug,
         e = Saga.Dom.getById,
         viewInit = function (cb) {
-            debug.log("SimpleView ->" + asset.id + ".init()");
+            debug.log("SimpleView ->" + asset.name + ".init()");
             div = e(asset.name);
             App.SimpleAnimation.genContentInit(div, cb);
         },
         viewShow = function (cb) {
-            debug.log("SimpleView ->" + asset.id + ".show()");
+            debug.log("SimpleView ->" + asset.name + ".show()");
             App.SimpleAnimation.genContentShow(div, cb);
         },
         viewHide = function (cb) {
-            debug.log("SimpleView ->" + asset.id + ".hide()");
+            debug.log("SimpleView ->" + asset.name + ".hide()");
             App.SimpleAnimation.genContentHide(div, cb);
         },
         viewRemove = function () {
-            debug.log("SimpleView ->" + asset.id + ".remove()");
+            debug.log("SimpleView ->" + asset.name + ".remove()");
         };
 
     view = {
