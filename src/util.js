@@ -4,8 +4,14 @@
 Saga.Util = (function () {
     "use strict";
     var pub = _,
-        hasLala = function () {};
-    pub.lala = function () {};
+        fileExtension = function (str) {
+            //var re = /(?:\.([^.]+))?$/;
+            return str.substr(str.lastIndexOf('.') + 1);
+            //return re.exec(str);
+        };
+    pub.fileExtension = function (str) {
+        return fileExtension(str);
+    };
 
     return pub;
 }());

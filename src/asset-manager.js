@@ -94,7 +94,7 @@ Saga.AssetManager = (function () {
                 currentStackAsset = loadStack[0];
                 loadStack.shift();
                 loadStackAsset(currentStackAsset);
-            }else{
+            } else {
                 debug.info("Saga.AssetManager.load() -> Nothing else to load");
             }
         },

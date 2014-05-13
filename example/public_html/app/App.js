@@ -82,7 +82,7 @@ App.Preloader = (function () {
             Saga.FontManager.init(App.Fonts);
             Saga.FontManager.once('loaded', function () {
                 debug.log("App.Manager.loadFonts() -> Saga.FontManager.on('loaded')");
-                startSite();
+                //startSite();
             });
             Saga.FontManager.load();
         },

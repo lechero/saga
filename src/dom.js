@@ -6,6 +6,7 @@
 Saga.Dom = (function () {
     "use strict";
     var pub,
+        u = Saga.Util,
         debug = Saga.Debug,
         head = document.getElementsByTagName("head")[0] || document.documentElement,
         hasClass = function (element, className) {
@@ -147,9 +148,18 @@ Saga.Dom = (function () {
                     func();
                 };
             }
+        },
+        setStyles = function (elem, override) {
+            var styles = override || {};
+            u.each(styles, function (value, style) {
+                elem.style[style] = value;
+            });
         };
 
     pub = {
+        setStyles: function (elem, override) {
+            setStyles(elem, override);
+        },
         hasClass: function (element, className) {
             return hasClass(element, className);
         },

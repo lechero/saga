@@ -11,6 +11,7 @@ cat src/browser.js >> build/saga.js
 cat src/holder.js >> build/saga.js
 cat src/asset.js >> build/saga.js
 cat src/route.js >> build/saga.js
+cat src/load-manager.js >> build/saga.js
 cat src/asset-manager.js >> build/saga.js
 cat src/font-manager.js >> build/saga.js
 cat src/image.js >> build/saga.js

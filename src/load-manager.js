@@ -1,0 +1,130 @@
+/*jslint browser:true*/
+/*global Saga */
+
+Saga.LoadManager = (function () {
+    "use strict";
+    var pub,
+        debug = Saga.Debug,
+        dom = Saga.Dom,
+        u = Saga.Util,
+        loader = Saga.net.Loader(),
+        loading = false,
+        loaded = {},
+        stack = [],
+        loadCss = function (file, cb) {
+            var node = document.createElement("link");
+            node.onload = function () {
+                if (cb) {
+                    cb(node);
+                }
+            };
+            node.setAttribute("rel", "stylesheet");
+            node.setAttribute("type", "text/css");
+            node.setAttribute("href", file);
+        },
+        loadImage = function (file, cb) {
+            var img = document.createElement('img');
+            img.onload = function () {
+                if (cb) {
+                    cb(img);
+                }
+            };
+            img.src = file;
+        },
+        loadJs = function (file, cb) {
+            var script = document.createElement('script'),
+                done = false,
+                head = dom.head();
+            script.type = "text/javascript";
+            script.onload = script.onreadystatechange = function () {
+                if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
+                    done = true;
+                    script.onload = script.onreadystatechange = null;
+
+                    if (head && script.parentNode) {
+                        head.removeChild(script);
+                    }
+                    if (cb) {
+                        cb(script);
+                    }
+                }
+            };
+            script.src = file;
+            head.appendChild(script);
+            return script;
+        },
+        loadHtml = function (file, cb) {
+            var loadOptions = {
+                method: "get",
+                url: file,
+                success: function (result) {
+                    if (cb) {
+                        cb(result);
+                    }
+                }
+            };
+            loader.execute(loadOptions);
+        },
+        loadItem = function () {
+            if (loading) {
+                debug.warn("Saga.LoadManager.loadItem() -> Already loading, waiting...");
+                return;
+            }
+
+            if (stack.length <= 0) {
+                debug.info("Saga.LoadManager.loadItem() -> Stack fully loaded!");
+                return;
+            }
+            //determine
+            var file,
+                ext,
+                loadItemDone = function () {
+                    stack.shift();
+                    loadItem();
+                };
+            debug.info("Saga.LoadManager.loadItem() ->", stack[0]);
+            if (u.isFunction(stack[0])) { // callback
+                stack[0]();
+                loadItemDone();
+            } else {
+                file = stack[0];
+                ext = u.fileExtension(file);
+                if (ext === "js" || ext === "jst") {
+                    loadJs(file, function (script) {
+                        loaded[file] = script;
+                        loadItemDone();
+                    });
+                } else if (ext === "png" || ext === "gif" || ext === "jpg" || ext === "jpeg") {
+                    loadImage(file, function (img) {
+                        loaded[file] = img;
+                        loadItemDone();
+                    });
+                } else if (ext === "html") {
+                    loadHtml(file, function (text) {
+                        loaded[file] = text;
+                        loadItemDone();
+                    });
+                } else if (ext === "css") {
+                    loadCss(file, function (node) {
+                        loaded[file] = node;
+                        loadItemDone();
+                    });
+                }
+            }
+        },
+        load = function (collection, cb) { // collection of urls
+            u.each(collection, function (item) {
+                stack.push(item);
+            });
+            stack.push(cb);
+            loadItem();
+        };
+
+    pub = {
+        load: function () {
+            load.apply(this, arguments);
+        }
+    };
+    u.extend(pub, Saga.Event());
+    return pub;
+}());

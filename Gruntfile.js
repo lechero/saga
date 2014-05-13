@@ -27,11 +27,25 @@ module.exports = function (grunt) {
                     cssDir: 'css'
                 }
             }
+        },
+        jst: {
+            compile: {
+                /*
+                options: {
+                    templateSettings: {
+                        interpolate: /\{\{(.+?)\}\}/g
+                    }
+                },*/
+                files: {
+                    "example/public_html/app/templates.js": ["example/public_html/app/html/**/*.html"]
+                }
+            }
         }
     });
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-jst');
 
     // Default task(s).
     //grunt.registerTask('default', ['uglify']);
