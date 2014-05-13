@@ -27,3 +27,4 @@ rm build/saga.tmp.js
 
 cp build/saga.js example/public_html/app/libs/saga.js
 cp build/saga-min.js example/public_html/app/libs/saga-min.js
+cp -f build/saga-min.js ../photoreality/vumc/public_html/app/js/libs/.

@@ -157,6 +157,27 @@ Saga.Dom = (function () {
         };
 
     pub = {
+        transitionEnd: function () {
+            var name,
+                el = document.createElement('bootstrap'),
+                transEndEventNames = {
+                    'WebkitTransition': 'webkitTransitionEnd',
+                    'MozTransition': 'transitionend',
+                    'OTransition': 'oTransitionEnd otransitionend',
+                    'transition': 'transitionend'
+                };
+
+            for (name in transEndEventNames) {
+                if (transEndEventNames.hasOwnProperty(name)) {
+                    if (el.style[name] !== undefined) {
+                        return {
+                            end: transEndEventNames[name]
+                        };
+                    }
+                }
+            }
+            return false;
+        },
         setStyles: function (elem, override) {
             setStyles(elem, override);
         },
