@@ -75,11 +75,14 @@ Saga.LoadManager = (function () {
                 debug.info("Saga.LoadManager.loadItem() -> Stack fully loaded!");
                 return;
             }
-            //determine
+
+            loading = true;
+
             var file,
                 ext,
                 loadItemDone = function () {
                     stack.shift();
+                    loading = false;
                     loadItem();
                 };
             debug.info("Saga.LoadManager.loadItem() ->", stack[0]);
@@ -112,10 +115,14 @@ Saga.LoadManager = (function () {
                 }
             }
         },
-        load = function (collection, cb) { // collection of urls
-            u.each(collection, function (item) {
-                stack.push(item);
-            });
+        load = function (stuff, cb) { // collection of urls
+            if (u.isString(stuff)) {
+                stack.push(stuff);
+            } else {
+                u.each(stuff, function (item) {
+                    stack.push(item);
+                });
+            }
             stack.push(cb);
             loadItem();
         };
@@ -123,6 +130,9 @@ Saga.LoadManager = (function () {
     pub = {
         load: function () {
             load.apply(this, arguments);
+        },
+        dir: function () {
+            return loaded;
         }
     };
     u.extend(pub, Saga.Event());

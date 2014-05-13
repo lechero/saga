@@ -7,12 +7,9 @@ Saga.AssetManager = (function () {
         debug = Saga.Debug,
         u = Saga.Util,
         dom = Saga.Dom,
-        loader = Saga.net.Loader(),
         assets = false,
         holders = {},
-        loadStack = [],
-        loading = false,
-        currentStackAsset = false,
+        loadManager = Saga.LoadManager,
         getHolder = function (name) {
             var holder;
             if (!holders[name]) {
@@ -20,92 +17,12 @@ Saga.AssetManager = (function () {
             }
             return holders[name];
         },
-        loadJs = function (file, cb) {
-            var script = document.createElement('script'),
-                done = false,
-                head = dom.head();
-            script.type = "text/javascript";
-            script.onload = script.onreadystatechange = function () {
-                if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
-                    done = true;
-                    script.onload = script.onreadystatechange = null;
-
-                    if (head && script.parentNode) {
-                        head.removeChild(script);
-                    }
-                    if (cb) {
-                        cb(script);
-                    }
-                }
-            };
-            script.src = file;
-            head.appendChild(script);
-            return script;
-        },
-        loadHtml = function (file, cb) {
-            var loadOptions = {
-                method: "get",
-                url: file,
-                success: function (result) {
-                    if (cb) {
-                        cb(result);
-                    }
-                }
-            };
-            loader.execute(loadOptions);
-        },
-        loadStackAsset = function (stackAsset) {
-            var items = stackAsset.asset.loadStack(),
-                loadNextItem = function () {
-                    var item,
-                        itemsLeft = u.filter(items, function (item) {
-                            return !item.loaded;
-                        });
-                    if (itemsLeft.length > 0) {
-                        item = itemsLeft[0];
-                        if (item.type === 'html' || item.type === 'template') {
-                            loadHtml(item.file, function (html) {
-                                item.loaded = true;
-                                item.content = html;
-                                loadNextItem();
-                            });
-                        }
-                        if (item.type === 'js') {
-                            loadJs(item.file, function (js) {
-                                item.loaded = true;
-                                item.content = js;
-                                loadNextItem();
-                            });
-                        }
-                    } else {
-                        stackAsset.done();
-                    }
-                };
-            loadNextItem();
-        },
-        load = function () {
-            debug.info("Saga.AssetManager.load() -> loading: ", loading);
-            if (loading) {
-                debug.info("Saga.AssetManager.load() -> Already loading, waiting...", currentStackAsset);
-                return;
-            }
-            if (loadStack.length > 0) {
-                loading = true;
-                currentStackAsset = loadStack[0];
-                loadStack.shift();
-                loadStackAsset(currentStackAsset);
-            } else {
-                debug.info("Saga.AssetManager.load() -> Nothing else to load");
-            }
-        },
         loadAssetDone = function (asset, cb) {
-            loading = false;
             asset.loadComplete();
             pub.fire(asset.name + ":loaded");
             if (cb) {
                 cb();
             }
-            load();
         },
         loadAsset = function (asset, cb) {
             debug.info("Saga.AssetManager.loadAsset() -> ", asset);
@@ -113,14 +30,19 @@ Saga.AssetManager = (function () {
                 loadAssetDone(asset, cb);
                 return;
             }
-            loadStack.push({
-                'asset': asset,
-                'done': function () {
-                    debug.info("Saga.AssetManager.loadAsset() -> Load Done ", asset);
-                    loadAssetDone(asset, cb);
-                }
+
+            var stack = asset.loadStack(),
+                urls = u.map(stack, function (item) {
+                    return item.file;
+                });
+
+            loadManager.load(urls, function () {
+                u.each(stack, function (item) {
+                    item.loaded = true;
+                    item.content = loadManager.dir()[item.file];
+                });
+                loadAssetDone(asset, cb);
             });
-            load();
         },
         initAssets = function (assets) {
             debug.info("Saga.AssetManager.initAssets() -> ", assets);
