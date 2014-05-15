@@ -149,14 +149,58 @@ Saga.Dom = (function () {
                 };
             }
         },
-        setStyles = function (elem, override) {
-            var styles = override || {};
+        setStyles = function (elem, obj, obj2, obj3, obj4) { /// ugly -> rewrite to check arguments, but i need it njouw
+            var styles = obj || {};
+            if (obj2) {
+                u.extend(styles, obj2);
+            }
+            if (obj3) {
+                u.extend(styles, obj3);
+            }
+            if (obj4) {
+                u.extend(styles, obj4);
+            }
+            debug.info("Saga.Dom.setStyles() -> Applying: ", styles);
             u.each(styles, function (value, style) {
                 elem.style[style] = value;
             });
         };
 
     pub = {
+        transitionStyles: function (props) {
+            var types = ['-webkit-transition', '-moz-transition', '-o-transition', '-ms-transition', 'transition'],
+                transforms = ['-webkit-transform', '-moz-transform', '-o-transform', '-ms-transition', 'transform'],
+                styles = {},
+                values;
+            u.each(types, function (type, index) {
+                values = [];
+                u.each(props, function (val, prop) {
+                    if (prop === "transform") {
+                        prop = transforms[index];
+                    }
+                    values.push(prop + " " + val);
+                });
+                styles[type] = values.join(", ");
+            });
+            return styles;
+        },
+        transformStyles: function (props) {
+            var types = ['-webkit-transform', '-moz-transform', '-o-transform', '-ms-transition', 'transform'],
+                styles = {},
+                values;
+            if (!props.hasOwnProperty("translate3d")) {
+                props.translate3d = "0, 0, 0";
+            }
+
+            u.each(types, function (type) {
+                values = [];
+                u.each(props, function (val, prop) {
+                    values.push(prop + "(" + val + ")");
+                });
+                styles[type] = values.join(" ");
+            });
+            return styles;
+        },
         transitionEnd: function () {
             var name,
                 el = document.createElement('bootstrap'),
@@ -178,8 +222,8 @@ Saga.Dom = (function () {
             }
             return false;
         },
-        setStyles: function (elem, override) {
-            setStyles(elem, override);
+        setStyles: function (elem, obj, obj2, obj3, obj4) {
+            setStyles(elem, obj, obj2, obj3, obj4);
         },
         hasClass: function (element, className) {
             return hasClass(element, className);
