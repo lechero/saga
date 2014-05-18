@@ -149,6 +149,28 @@ Saga.Dom = (function () {
                 };
             }
         },
+        // UTILS ? ?!?!? -> copied to animation for now
+        capitaliseFirstLetter = function (string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        },
+        toCamelCase = function (str) {
+            if (str.charAt(0) === "-") {
+                return str;
+            }
+            var nr = 0,
+                parts = str.split("-"),
+                newParts = u.map(parts, function (part) {
+                    if (nr === 0) {
+                        nr += 1;
+                        return part;
+                    }
+                    if (part === "") { // troubles, check for starting with - ?? mayb <- it fuckes le transform , grrr
+                        debug.warn("Something is starting with a -");
+                    }
+                    return part.charAt(0).toUpperCase() + part.slice(1);
+                });
+            return newParts.join("");
+        },
         setStyles = function (elem, obj, obj2, obj3, obj4) { /// ugly -> rewrite to check arguments, but i need it njouw
             var styles = obj || {};
             if (obj2) {
@@ -160,8 +182,11 @@ Saga.Dom = (function () {
             if (obj4) {
                 u.extend(styles, obj4);
             }
-            debug.info("Saga.Dom.setStyles() -> Applying: ", styles);
+            debug.info("Saga.Dom.setStyles() -> Applying: ", elem, styles);
             u.each(styles, function (value, style) {
+                // test
+                style = toCamelCase(style);
+                debug.info("Saga.Dom.setStyles() -> Applying: ", style, ": ", value);
                 elem.style[style] = value;
             });
         };
