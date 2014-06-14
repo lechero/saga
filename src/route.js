@@ -10,24 +10,36 @@ Saga.Route = (function () {
         hash = false,
         hashParts = false,
         baseHash = false,
-        hashVars = false,// ? ?
+        hashVars = false, // ? ?
         getHash = function () {
             return window.location.hash.replace("#", "");
         },
-        getHashParts = function () {
+        getHashParts = function (hash) {
+            return hash.split("/");
+            /*
             var hash = window.location.hash.replace("#", "");
             return hash.split("/");
+            */
         },
         hashChange = function (newHash) {
             debug.info("Saga.Route.hashChange('" + newHash + "'), from '" + hash + "'");
-            hash = newHash;
-            hashParts = getHashParts();
-            baseHash = hashParts[0];
-            if (routes.hasOwnProperty(baseHash)) {
-                routes[baseHash]();
+
+            hashParts = getHashParts(newHash);
+            if (baseHash !== hashParts[0]) {
+                baseHash = hashParts[0];
+                if (routes.hasOwnProperty(baseHash)) {
+                    routes[baseHash]();
+                } else {
+                    routes['default']();
+                }
+                pub.fire("base:changed");
             } else {
-                routes['default']();
+                pub.fire("vars:changed", hashParts.slice(1));
             }
+
+            hash = newHash;
+
+            pub.fire("changed");
         },
         init = function (projectRoutes) {
             routes = projectRoutes;
@@ -53,6 +65,9 @@ Saga.Route = (function () {
     pub = {
         init: function (routes) {
             init(routes);
+        },
+        hashVars: function () {
+            return getHashParts(window.location.hash.replace("#", ""));
         },
         showPage: function (page) {
             showPage(page);

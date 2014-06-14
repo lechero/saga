@@ -9,15 +9,39 @@ Saga.Dom = (function () {
         u = Saga.Util,
         debug = Saga.Debug,
         head = document.getElementsByTagName("head")[0] || document.documentElement,
+        prefixBrowser = ["webkit", "moz", "MS", "o", ""],
+        //line.getAttributeNS(null, "class"
+        hasClassNS = function (element, className) {
+            var classes = element.getAttributeNS(null, "class");
+            if (element && classes) {
+                return classes.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+            }
+            return false;
+        },
         hasClass = function (element, className) {
             if (element && element.className) {
                 return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
             }
             return false;
         },
+        addClassNs = function (element, className) {
+            var classes = element.getAttributeNS(null, "class");
+            if (!hasClassNS(element, className)) {
+                classes += " " + className;
+                element.setAttributeNS(null, "class", classes);
+            }
+        },
         addClass = function (element, className) {
             if (!hasClass(element, className)) {
                 element.className += " " + className;
+            }
+            return true;
+        },
+        removeClassNs = function (element, className) {
+            var classes = element.getAttributeNS(null, "class");
+            if (hasClassNS(element, className)) {
+                classes = classes.replace(new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ');
+                element.setAttributeNS(null, "class", classes);
             }
             return true;
         },
@@ -133,6 +157,90 @@ Saga.Dom = (function () {
             }
             return true;
         },
+        setInputData = function (formClass, data, container) {
+            debug.info("Saga.Dom.setInputData() -> ", formClass, container, data);
+            var fields = getByClass(formClass),
+                fieldsTotal = fields.length,
+                i = 0;
+
+            for (i; i < fieldsTotal; i += 1) {
+                //console.log(fields[i].name+" / "+data[fields[i].name]);
+                if ((data[fields[i].name] || data[fields[i].name] === "") && fields[i].type !== "file") {
+                    fields[i].value = data[fields[i].name];
+                }
+            }
+            //        }
+        },
+        getInputData = function (fieldClassName, findIn, man, incAll) { // check for all fields except file
+            var data = {},
+                files = {},
+                fields = getByClass(fieldClassName, findIn),
+                gotFields = {},
+                fieldsTotal = fields.length,
+                i = 0,
+                valid = true,
+                mandatory = false,
+                includeAll,
+                invalidVar = true,
+                isInvalidVar = function (invalidVar) {
+                    return fields[i].value === invalidVar;
+                };
+
+            if (incAll) {
+                includeAll = incAll;
+            } else {
+                includeAll = true;
+            }
+            if (man) {
+                mandatory = man;
+            }
+
+
+            for (i; i < fieldsTotal; i += 1) {
+                if (fields[i].type !== "file" && fields[i].type !== "radio") {
+                    removeClass(fields[i], "error");
+                    if (mandatory[fields[i].name] && fields[i].value === "") {
+                        addClass(fields[i], "error");
+                        valid = false;
+                    }
+                    if (mandatory[fields[i].name].no) {
+                        invalidVar = u.find(mandatory[fields[i].name].no, isInvalidVar);
+                        if (invalidVar) {
+                            addClass(fields[i], "error");
+                            valid = false;
+                        }
+                    }
+                    if (includeAll || (!includeAll && fields[i].value !== "")) {
+                        data[fields[i].name] = fields[i].value;
+                        gotFields[fields[i].name] = fields[i];
+                        //}
+                    }
+                }
+                if (fields[i].type === "radio" && fields[i].checked) {
+                    if (mandatory[fields[i].name] && fields[i].value === "") {
+                        addClass(fields[i], "error");
+                        valid = false;
+                    }
+                    if (includeAll || (!includeAll && fields[i].value !== "")) {
+                        data[fields[i].name] = fields[i].value;
+                        gotFields[fields[i].name] = fields[i];
+                    }
+                }
+
+                if (fields[i].value !== "" && fields[i].type === "file") {
+                    //if(!includeAll && fields[i].value !== ""){
+                    files[fields[i].name] = fields[i];
+                    //}
+                }
+
+            }
+            return {
+                'valid': valid,
+                'data': data,
+                'fields': gotFields,
+                'files': files
+            };
+        },
         getElementStyle = function (element, styleProp) {
             return (element.currentStyle) ? element.currentStyle[styleProp] : (window.getComputedStyle) ? document.defaultView.getComputedStyle(element, null).getPropertyValue(styleProp) : 'unknown';
         },
@@ -149,7 +257,6 @@ Saga.Dom = (function () {
                 };
             }
         },
-        // UTILS ? ?!?!? -> copied to animation for now
         capitaliseFirstLetter = function (string) {
             return string.charAt(0).toUpperCase() + string.slice(1);
         },
@@ -171,6 +278,73 @@ Saga.Dom = (function () {
                 });
             return newParts.join("");
         },
+        getClickXY = function (evt, scale) {
+            var scaleFactor = 1,
+                xy = {
+                    x: evt.layerX,
+                    y: evt.layerY
+                };
+
+            if (scale) {
+                scaleFactor = scale;
+            }
+
+            if (navigator.userAgent.toLowerCase().indexOf('firefox') <= -1) {
+                debug.error("NO FF");
+                if (!evt) {
+                    evt = window.event;
+                }
+                xy.x = Math.round(xy.x / scaleFactor);
+                xy.y = Math.round(xy.y / scaleFactor);
+                debug.info("Scale Adjusting x,y position !!", scaleFactor);
+            }
+            return xy;
+        },
+        mouseCoords = function (evt) {
+            if (evt.pageX || evt.pageY) {
+                return {
+                    x: evt.pageX,
+                    y: evt.pageY
+                };
+            }
+            return {
+                x: evt.clientX + document.body.scrollLeft - document.body.clientLeft,
+                y: evt.clientY + document.body.scrollTop - document.body.clientTop
+            };
+        },
+        /*
+        animationstart	animationstart	webkitAnimationStart	oanimationstart	MSAnimationStart
+        animationiteration	animationiteration	webkitAnimationIteration	oanimationiteration	MSAnimationIteration
+        animationend	animationend	webkitAnimationEnd	oanimationend	MSAnimationEnd
+
+        Webkit browsers (Chrome, Safari) use webkitTransitionEnd
+        Firefox uses transitionend
+        IE9+ uses msTransitionEnd
+        Opera uses oTransitionEnd
+
+        */
+        prefixedEvent = function (element, type, callback, all) {
+            var p = 0,
+                l = prefixBrowser.length,
+                fired = false,
+                endCb = function () {
+                    if (!fired) {
+                        fired = true;
+                        callback();
+                    }
+                };
+            for (p; p < l; p += 1) {
+                if (!prefixBrowser[p]) {
+                    type = type.toLowerCase();
+                }
+                element.addEventListener(prefixBrowser[p] + type, endCb, false);
+            }
+        },
+        transitionEnd = function (elem, cb) {
+            var fired = false;
+            prefixedEvent(elem, "TransitionEnd", cb);
+
+        },
         setStyles = function (elem, obj, obj2, obj3, obj4) { /// ugly -> rewrite to check arguments, but i need it njouw
             var styles = obj || {};
             if (obj2) {
@@ -182,16 +356,31 @@ Saga.Dom = (function () {
             if (obj4) {
                 u.extend(styles, obj4);
             }
-            debug.info("Saga.Dom.setStyles() -> Applying: ", elem, styles);
+            //debug.info("Saga.Dom.setStyles() -> Applying: ", elem, styles);
             u.each(styles, function (value, style) {
                 // test
                 style = toCamelCase(style);
-                debug.info("Saga.Dom.setStyles() -> Applying: ", style, ": ", value);
+                //debug.info("Saga.Dom.setStyles() -> Applying: ", style, ": ", value);
                 elem.style[style] = value;
             });
         };
 
     pub = {
+        mouseCoords: function (evt) {
+            return mouseCoords(evt);
+        },
+        getClickXY: function (evt, scale) {
+            return getClickXY(evt, scale);
+        },
+        setInputData: function (formClass, data, container) {
+            return setInputData(formClass, data, container);
+        },
+        getInputData: function (fieldClassName, findIn, man, incAll) {
+            return getInputData(fieldClassName, findIn, man, incAll);
+        },
+        /*
+      
+        */
         transitionStyles: function (props) {
             var types = ['-webkit-transition', '-moz-transition', '-o-transition', '-ms-transition', 'transition'],
                 transforms = ['-webkit-transform', '-moz-transform', '-o-transform', '-ms-transition', 'transform'],
@@ -226,26 +415,11 @@ Saga.Dom = (function () {
             });
             return styles;
         },
-        transitionEnd: function () {
-            var name,
-                el = document.createElement('bootstrap'),
-                transEndEventNames = {
-                    'WebkitTransition': 'webkitTransitionEnd',
-                    'MozTransition': 'transitionend',
-                    'OTransition': 'oTransitionEnd otransitionend',
-                    'transition': 'transitionend'
-                };
-
-            for (name in transEndEventNames) {
-                if (transEndEventNames.hasOwnProperty(name)) {
-                    if (el.style[name] !== undefined) {
-                        return {
-                            end: transEndEventNames[name]
-                        };
-                    }
-                }
-            }
-            return false;
+        prefixedEvent: function (element, type, callback) {
+            return prefixedEvent(element, type, callback);
+        },
+        transitionEnd: function (elem, cb) {
+            return transitionEnd(elem, cb);
         },
         setStyles: function (elem, obj, obj2, obj3, obj4) {
             setStyles(elem, obj, obj2, obj3, obj4);
@@ -256,8 +430,14 @@ Saga.Dom = (function () {
         addClass: function (element, className) {
             return addClass(element, className);
         },
+        addClassNS: function (element, className) {
+            return addClassNs(element, className);
+        },
         removeClass: function (element, className) {
             return removeClass(element, className);
+        },
+        removeClassNS: function (element, className) {
+            return removeClassNs(element, className);
         },
         getByClass: function (className, findIn) {
             return getByClass(className, findIn);

@@ -5,7 +5,7 @@ Saga.Debug = (function () {
     "use strict";
     var pub,
         util = Saga.Util,
-        levels = ["log", "info", "error", "warn"],
+        levels = ["log", "info", "error", "warn", "trace"],
         activeLevels = ["log", "error"],
         timestamp = function () {
             var d = new Date();
@@ -21,6 +21,11 @@ Saga.Debug = (function () {
                     //console.log("Saga.Debug.log() -> catch", err);
                 }
             }
+        },
+        trace = function () {
+            var arg = Array.prototype.slice.call(arguments, 0);
+            arg.unshift('trace');
+            output.apply(this, arg);
         },
         log = function () {
             var arg = Array.prototype.slice.call(arguments, 0);

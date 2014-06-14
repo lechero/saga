@@ -72,7 +72,14 @@ Saga.AssetManager = (function () {
                 pub.fire(asset.name + ":removed");
                 debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
             }
-            asset.Js().parentNode.removeChild(asset.Js());
+
+            try {
+                asset.Js().parentNode.removeChild(asset.Js());
+            } catch (errr) {
+                //pub.fire(asset.name + ":removed");
+                //debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
+            }
+
         },
         hide = function (asset, cb) {
             debug.info("Saga.AssetManager.hide() -> ", asset);

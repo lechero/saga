@@ -104,7 +104,7 @@ Saga.Animation = (function () {
                 styles = {},
                 tmp;
 
-            if (elem) { //&& elem.hasOwnProperty("style") && elem.style.hasOwnProperty("transform")) {
+            if (elem && elem.hasOwnProperty("style") && elem.style.hasOwnProperty("transform")) {
                 if (elem.style.transform !== "") {
                     u.each(elem.style.transform.split(" "), function (val) {
                         tmp = val.split("(");
@@ -210,6 +210,7 @@ Saga.Animation = (function () {
                             cb();
                         }
                     }
+                    
                     u.defer(function () {
                         setStyles(elem, props);
                     });

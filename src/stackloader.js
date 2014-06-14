@@ -43,10 +43,11 @@ Saga.StackLoader = function () {
                 if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
                     done = true;
                     script.onload = script.onreadystatechange = null;
-
+/*
                     if (head && script.parentNode) {
                         head.removeChild(script);
                     }
+*/
                     if (cb) {
                         cb(script);
                     }
@@ -95,7 +96,7 @@ Saga.StackLoader = function () {
 
         var file,
             ext;
-        debug.info("Saga.LoadManager.loadItem() ->", stack[0]);
+        //debug.info("Saga.LoadManager.loadItem() ->", stack[0]);
         if (u.isFunction(stack[0])) { // callback
             stack[0]();
             loadItemDone();

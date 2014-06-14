@@ -50,6 +50,9 @@ Saga.Event = function () {
         once = function (evt, cb, context) {
             return addCb(evt, cb, context, 1);
         },
+        kill = function () { // removes all listeners !!!!
+            cbs = {};
+        },
         fire = function (evt, data) {
             if (typeof cbs[evt] === "undefined") {
                 return;
@@ -79,6 +82,9 @@ Saga.Event = function () {
         },
         fire: function (evt, data) {
             fire(evt, data);
+        },
+        kill: function () {
+            kill();
         }
     };
     return pub;
