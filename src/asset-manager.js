@@ -8,6 +8,7 @@ Saga.AssetManager = (function () {
         u = Saga.Util,
         dom = Saga.Dom,
         assets = false,
+        templates = false,
         holders = {},
         loadManager = Saga.LoadManager,
         getHolder = function (name) {
@@ -140,11 +141,39 @@ Saga.AssetManager = (function () {
             } else {
                 place(asset);
             }
+        },
+        initTemplates = function (tmpls, cb) {
+            templates = tmpls;
+            var urls = u.values(templates);
+
+            loadManager.load(urls, function () {
+                u.each(templates, function (item, name) {
+                    templates[name] = u.template(loadManager.dir()[item]);
+                    //item.content = loadManager.dir()[item];
+                });
+                if (cb) {
+                    //templates
+                    cb(templates);
+                }
+                /*
+                u.each(stack, function (item) {
+                    item.loaded = true;
+                    item.content = loadManager.dir()[item.file];
+                });
+                //loadAssetDone(asset, cb);
+                */
+            });
         };
 
     pub = {
+        initTemplates: function (templates, cb) {
+            initTemplates(templates, cb);
+        },
         init: function (projectAssets) {
             init(projectAssets);
+        },
+        hide: function (asset, cb) {
+            hide(asset, cb);
         },
         show: function (asset) {
             show(asset);

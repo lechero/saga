@@ -43,11 +43,11 @@ Saga.StackLoader = function () {
                 if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
                     done = true;
                     script.onload = script.onreadystatechange = null;
-/*
+                    /*
                     if (head && script.parentNode) {
                         head.removeChild(script);
                     }
-*/
+                    */
                     if (cb) {
                         cb(script);
                     }
@@ -83,12 +83,13 @@ Saga.StackLoader = function () {
 
     loadItem = function () {
         if (loading) {
-            debug.warn("Saga.LoadManager.loadItem() -> Already loading, waiting...");
+            debug.warn("Saga.StackLoader.loadItem() -> Already loading, waiting...");
             return;
         }
 
         if (stack.length <= 0) {
-            debug.info("Saga.LoadManager.loadItem() -> Stack fully loaded!");
+            debug.info("Saga.StackLoader.loadItem() -> Stack fully loaded!");
+            // event?@?!!?!
             return;
         }
 
@@ -96,7 +97,7 @@ Saga.StackLoader = function () {
 
         var file,
             ext;
-        //debug.info("Saga.LoadManager.loadItem() ->", stack[0]);
+        //debug.info("Saga.StackLoader.loadItem() ->", stack[0]);
         if (u.isFunction(stack[0])) { // callback
             stack[0]();
             loadItemDone();
@@ -128,6 +129,7 @@ Saga.StackLoader = function () {
     };
 
     load = function (stuff, cb) { // collection of urls
+        //debug.info("Saga.StackLoader.load() -> stuff: " + stuff);
         if (u.isString(stuff)) {
             stack.push(stuff);
         } else {

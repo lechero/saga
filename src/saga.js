@@ -10,19 +10,21 @@ var Saga = (function () {
         vars = false,
         init = function () {
             try {
-                JSON.parse(doc.getElementById(id).innerHTML);
+               
+                vars = JSON.parse(doc.getElementById(id).innerHTML);
+               
             } catch (err) {
                 vars = "NOT_SET";
             }
         };
 
     pub = {
-        vars: (function () {
-            return vars;
-        }())
+        vars: function () {
+            return vars
+        }
     };
 
     init();
-
+    //console.error("!!!!!!!!!!!!!1", vars);
     return pub;
 }());

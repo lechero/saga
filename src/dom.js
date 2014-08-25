@@ -12,7 +12,7 @@ Saga.Dom = (function () {
         prefixBrowser = ["webkit", "moz", "MS", "o", ""],
         //line.getAttributeNS(null, "class"
         hasClassNS = function (element, className) {
-            var classes = element.getAttributeNS(null, "class");
+            var classes = element.getAttributeNS(null, "class") || "";
             if (element && classes) {
                 return classes.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
             }
@@ -25,10 +25,14 @@ Saga.Dom = (function () {
             return false;
         },
         addClassNs = function (element, className) {
-            var classes = element.getAttributeNS(null, "class");
-            if (!hasClassNS(element, className)) {
-                classes += " " + className;
-                element.setAttributeNS(null, "class", classes);
+            try {
+                var classes = element.getAttributeNS(null, "class") || "";
+                if (!hasClassNS(element, className)) {
+                    classes += " " + className;
+                    element.setAttributeNS(null, "class", classes);
+                }
+            } catch (e) {
+                //debug.warn("Saga.Dom.addClassNs(\"" + element + "\"), Class: " + className + " ERROR", e);
             }
         },
         addClass = function (element, className) {
@@ -38,10 +42,14 @@ Saga.Dom = (function () {
             return true;
         },
         removeClassNs = function (element, className) {
-            var classes = element.getAttributeNS(null, "class");
-            if (hasClassNS(element, className)) {
-                classes = classes.replace(new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ');
-                element.setAttributeNS(null, "class", classes);
+            try {
+                var classes = element.getAttributeNS(null, "class") || "";
+                if (hasClassNS(element, className)) {
+                    classes = classes.replace(new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ');
+                    element.setAttributeNS(null, "class", classes);
+                }
+            } catch (e) {
+                //debug.warn("Saga.Dom.removeClassNs(\"" + element + "\"), Class: " + className + " ERROR", e);
             }
             return true;
         },
@@ -84,6 +92,17 @@ Saga.Dom = (function () {
                 return false;
             }
             return true;
+        },
+        addCssFile = function (file, id) {
+            var link = document.createElement('link');
+            if (id) {
+                link.id = id;
+            }
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = file;
+            link.media = 'all';
+            head.appendChild(link);
         },
         addCss = function (cssTxt, id) {
             var style = document.createElement("style");
@@ -198,6 +217,9 @@ Saga.Dom = (function () {
 
             for (i; i < fieldsTotal; i += 1) {
                 if (fields[i].type !== "file" && fields[i].type !== "radio") {
+
+                    //debug.error("DOM INPUT",fields[i],fields[i].name);
+
                     removeClass(fields[i], "error");
                     if (mandatory[fields[i].name] && fields[i].value === "") {
                         addClass(fields[i], "error");
@@ -215,6 +237,7 @@ Saga.Dom = (function () {
                         gotFields[fields[i].name] = fields[i];
                         //}
                     }
+                    //debug.error("DOM INPUT END ",fields[i],fields[i].name);
                 }
                 if (fields[i].type === "radio" && fields[i].checked) {
                     if (mandatory[fields[i].name] && fields[i].value === "") {
@@ -381,6 +404,16 @@ Saga.Dom = (function () {
         /*
       
         */
+        setOrigin: function (elem, point) {
+            var transformOrigin = point.x + "px " + point.y + "px";
+            debug.warn("Saga.FloorMap.Floor.setOrigin()", elem, point, transformOrigin);
+            elem.style.WebkitTransformOrigin = transformOrigin;
+            elem.style.MozTransformOrigin = transformOrigin;
+            elem.style.OTransformOrigin = transformOrigin;
+            elem.style.msTransformOrigin = transformOrigin;
+            elem.style.KhtmlTransformOrigin = transformOrigin;
+            elem.style.TransformOrigin = transformOrigin;
+        },
         transitionStyles: function (props) {
             var types = ['-webkit-transition', '-moz-transition', '-o-transition', '-ms-transition', 'transition'],
                 transforms = ['-webkit-transform', '-moz-transform', '-o-transform', '-ms-transition', 'transform'],
@@ -402,10 +435,11 @@ Saga.Dom = (function () {
             var types = ['-webkit-transform', '-moz-transform', '-o-transform', '-ms-transition', 'transform'],
                 styles = {},
                 values;
+            /*
             if (!props.hasOwnProperty("translate3d")) {
                 props.translate3d = "0, 0, 0";
             }
-
+        */
             u.each(types, function (type) {
                 values = [];
                 u.each(props, function (val, prop) {
@@ -459,6 +493,9 @@ Saga.Dom = (function () {
         },
         removeJs: function (id) {
             return removeJs(id);
+        },
+        addCssFile: function (file, id) {
+            addCssFile(file, id);
         },
         addCss: function (cssContents, id) {
             return addCss(cssContents, id);
