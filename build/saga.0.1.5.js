@@ -416,7 +416,7 @@ Saga.net = (function () {
                 timeout,
                 abortHandler,
                 initOptions = function (options) {
-                    debug.warn("Saga.net.Loader -> initOptions: ", options, data);
+                    debug.info("Saga.net.Loader -> initOptions: ", options, data);
                     if (options) {
                         if (options.url) {
                             url = options.url;
@@ -445,8 +445,9 @@ Saga.net = (function () {
                     }
                 };
 
-            initOptions(options);
-
+            if(options){
+                initOptions(options);
+            }
             xmlHttp = createXMLHttp(success, error);
 
             xmlHttp.onreadystatechange = function () {
@@ -490,7 +491,7 @@ Saga.net = (function () {
 
             execute = function (options) {
                 initOptions(options);
-                debug.warn("Saga.net.Loader -> execute()", url, options, data);
+                debug.info("Saga.net.Loader -> execute()", url, options, data);
                 start = new Date().getTime();
                 xmlHttp.open(method, url, true);
                 if (String(method) === "post") {
@@ -1798,7 +1799,7 @@ Saga.StackLoader = function () {
 
     loadItem = function () {
         if (loading) {
-            debug.warn("Saga.StackLoader.loadItem() -> Already loading, waiting...");
+            debug.info("Saga.StackLoader.loadItem() -> Already loading, waiting...");
             return;
         }
 
@@ -1844,7 +1845,7 @@ Saga.StackLoader = function () {
     };
 
     load = function (stuff, cb) { // collection of urls
-        //debug.info("Saga.StackLoader.load() -> stuff: " + stuff);
+        debug.info("Saga.StackLoader.load() -> stuff: " + stuff);
         if (u.isString(stuff)) {
             stack.push(stuff);
         } else {

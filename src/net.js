@@ -54,7 +54,7 @@ Saga.net = (function () {
                 timeout,
                 abortHandler,
                 initOptions = function (options) {
-                    debug.warn("Saga.net.Loader -> initOptions: ", options, data);
+                    debug.info("Saga.net.Loader -> initOptions: ", options, data);
                     if (options) {
                         if (options.url) {
                             url = options.url;
@@ -83,8 +83,9 @@ Saga.net = (function () {
                     }
                 };
 
-            initOptions(options);
-
+            if(options){
+                initOptions(options);
+            }
             xmlHttp = createXMLHttp(success, error);
 
             xmlHttp.onreadystatechange = function () {
@@ -128,7 +129,7 @@ Saga.net = (function () {
 
             execute = function (options) {
                 initOptions(options);
-                debug.warn("Saga.net.Loader -> execute()", url, options, data);
+                debug.info("Saga.net.Loader -> execute()", url, options, data);
                 start = new Date().getTime();
                 xmlHttp.open(method, url, true);
                 if (String(method) === "post") {

@@ -83,7 +83,7 @@ Saga.StackLoader = function () {
 
     loadItem = function () {
         if (loading) {
-            debug.warn("Saga.StackLoader.loadItem() -> Already loading, waiting...");
+            debug.info("Saga.StackLoader.loadItem() -> Already loading, waiting...");
             return;
         }
 
@@ -129,7 +129,7 @@ Saga.StackLoader = function () {
     };
 
     load = function (stuff, cb) { // collection of urls
-        //debug.info("Saga.StackLoader.load() -> stuff: " + stuff);
+        debug.info("Saga.StackLoader.load() -> stuff: " + stuff);
         if (u.isString(stuff)) {
             stack.push(stuff);
         } else {

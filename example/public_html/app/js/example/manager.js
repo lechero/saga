@@ -11,7 +11,6 @@ App.Manager = (function () {
         u = Saga.Util,
         e = d.elem,
         load = Saga.StackLoader(),
-        stackLoader = Saga.StackLoader(),
 
         routeChanged = function (route) {
             debug.log("App.Manager.routeChanged() -> ", route);
