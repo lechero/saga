@@ -69,6 +69,9 @@ Saga.Route = (function () {
         hashVars: function () {
             return getHashParts(window.location.hash.replace("#", "")).slice(1);
         },
+        page: function () {
+            return baseHash;
+        },
         showPage: function (page) {
             showPage(page);
         }
