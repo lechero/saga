@@ -63,7 +63,7 @@ Saga.Event = function () {
             if (l > 0) {
                 for (i; i >= 0; i -= 1) {
                     cbs[evt][i].cb(data);
-                    if (cbs[evt][i].type === 1) {
+                    if (cbs[evt][i] && cbs[evt][i].type === 1) {
                         cbs[evt].splice(i, 1);
                     }
                 }

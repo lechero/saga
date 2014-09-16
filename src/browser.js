@@ -33,6 +33,17 @@ Saga.Browser = (function () {
         },
         getCookie: function (name) {
             setCookie(name);
+        },
+        isIE: function () {
+            var myNav = navigator.userAgent.toLowerCase(),
+                ie = (myNav.indexOf('msie') !== -1) ? parseInt(myNav.split('msie')[1], 10) : false;
+            if (myNav.indexOf("trident") > -1){
+                ie = true;
+            }
+            
+          //  alert(myNav+"\n"+ie);
+            //alert(myNav);
+            return ie;
         }
     };
     return pub;

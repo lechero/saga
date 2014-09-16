@@ -313,7 +313,7 @@ Saga.Dom = (function () {
             }
 
             if (navigator.userAgent.toLowerCase().indexOf('firefox') <= -1) {
-                debug.error("NO FF");
+                //debug.error("NO FF");
                 if (!evt) {
                     evt = window.event;
                 }
@@ -346,6 +346,14 @@ Saga.Dom = (function () {
         Opera uses oTransitionEnd
 
         */
+        bindEvent = function (el, eventName, eventHandler) {
+            if (el.addEventListener) {
+                el.addEventListener(eventName, eventHandler, false);
+            } else if (el.attachEvent) {
+                debug.log("Saga.Dom.bindEvent() -> ", eventName, 'on' + eventName);
+                el.attachEvent('on' + eventName, eventHandler);
+            }
+        },
         prefixedEvent = function (element, type, callback, all) {
             var p = 0,
                 l = prefixBrowser.length,
@@ -360,7 +368,8 @@ Saga.Dom = (function () {
                 if (!prefixBrowser[p]) {
                     type = type.toLowerCase();
                 }
-                element.addEventListener(prefixBrowser[p] + type, endCb, false);
+                //element.addEventListener(prefixBrowser[p] + type, endCb, false);
+                bindEvent(element, prefixBrowser[p] + type, callback);
             }
         },
         transitionEnd = function (elem, cb) {

@@ -6,20 +6,25 @@ Saga.Debug = (function () {
     var pub,
         util = Saga.Util,
         levels = ["log", "info", "error", "warn", "trace"],
-        activeLevels = ["log", "error"],
+        activeLevels = ["log", "info", "warn", "error"],
         timestamp = function () {
             var d = new Date();
             return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
         },
         output = function (type) {
+
             if (util.contains(activeLevels, type)) {
                 var arg = Array.prototype.slice.call(arguments, 1);
                 arg.unshift(timestamp() + ": ");
+                //console.log(type, arg,console.log.apply(console,"test"));
                 try {
                     console[type].apply(console, arg);
                 } catch (err) {
+                     console[type](arg.join(", "));
                     //console.log("Saga.Debug.log() -> catch", err);
                 }
+            } else {
+                console.log("No contains");
             }
         },
         trace = function () {
@@ -47,6 +52,35 @@ Saga.Debug = (function () {
             arg.unshift('warn');
             output.apply(this, arg);
         };
+    
+    if (Function.prototype.bind && window.console && typeof console.log === "object") {
+        //http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
+        console.log("debug reset console");
+        levels.forEach(function (method) {
+            console[method] = this.bind(console[method], console);
+        }, Function.prototype.call);
+    }
+    
+    //console.log("debug")
+
+
+    /*
+    if (Function.prototype.bind && window.console && typeof console.log == "object") {
+        util.each(levels,function(method){
+            console[method] = this.bind(console[method], console);
+        })
+    }
+
+
+    if (Function.prototype.bind && window.console && typeof console.log == "object") {
+    ["log",
+        "info", "warn", "error", "assert", "dir", "clear", "profile", "profileEnd"
+    ].forEach(function (method) {
+            console[method] = this.bind(console[method], console);
+        }, Function.prototype.call);
+    }
+
+    */
     pub = {
         log: function () {
             log.apply(this, arguments);

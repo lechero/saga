@@ -54,6 +54,7 @@ Saga.net = (function () {
                 timeout,
                 abortHandler,
                 initOptions = function (options) {
+                    debug.warn("Saga.net.Loader -> initOptions: ", options, data);
                     if (options) {
                         if (options.url) {
                             url = options.url;
@@ -83,7 +84,7 @@ Saga.net = (function () {
                 };
 
             initOptions(options);
-            
+
             xmlHttp = createXMLHttp(success, error);
 
             xmlHttp.onreadystatechange = function () {
@@ -112,7 +113,8 @@ Saga.net = (function () {
                             error.call(null, xmlHttp.responseText);
                         }
                     }
-                }/* else {
+                }
+                /* else {
                     debug.warn("Saga.net.Loader -> state(" + xmlHttp.readyState + "/" + xmlHttp.status + ")");
                 }*/
             };
@@ -126,7 +128,7 @@ Saga.net = (function () {
 
             execute = function (options) {
                 initOptions(options);
-                debug.warn("Saga.net.Loader -> execute()", url, options);
+                debug.warn("Saga.net.Loader -> execute()", url, options, data);
                 start = new Date().getTime();
                 xmlHttp.open(method, url, true);
                 if (String(method) === "post") {
