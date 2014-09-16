@@ -38,8 +38,7 @@ App.Manager = (function () {
         init = function () {
             debug.levels(["log", "info", "error", "warn", "trace"]);
             debug.log("App.Manager.init()");
-
-            debug.log("App.Manager.init() -> preloader.shown: ", arguments);
+            
             Saga.AssetManager.init(App.Assets);
             Saga.AssetManager.initTemplates(App.Templates, templatesLoaded);
         };
