@@ -45,6 +45,10 @@
             debug.log(asset.name + ".addListeners()");
             Saga.Route.on("changed", setMenuButtons);
         },
+        removeListeners = function () {
+            debug.log(asset.name + ".addListeners()");
+            Saga.Route.off("changed", setMenuButtons);
+        },
         init = function () {
             debug.log(asset.name + ".init()");
             div = e('Menu');
@@ -54,6 +58,7 @@
         },
         deinit = function () {
             debug.log(asset.name + ".deinit()");
+            removeListeners();
         };
 
     Saga.Util.extend(asset.View, App.SimpleView(asset));
