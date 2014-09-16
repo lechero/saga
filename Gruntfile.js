@@ -4,13 +4,48 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        concat: {
+            options: {},
+            dist: {
+                src: [
+                    'src/libs/underscore-min.js',
+                    'src/saga.js',
+                    'src/util.js',
+                    'src/debug.js',
+                    'src/event.js',
+                    'src/net.js',
+                    'src/dom.js',
+                    'src/animation.js',
+                    'src/browser.js',
+                    'src/holder.js',
+                    'src/asset.js',
+                    'src/route.js',
+                    'src/stackloader.js',
+                    'src/load-manager.js',
+                    'src/asset-manager.js',
+                    'src/font-manager.js',
+                    'src/keyboard.js',
+                    'src/graph.js',
+                    'src/abracadabra.js'
+                ],
+                dest: 'build/saga.<%= pkg.version %>.js'
+            }
+        },
         uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
-            },
+            options: {},
             build: {
-                src: 'src/<%= pkg.name %>.js',
-                dest: 'build/<%= pkg.name %>.min.js'
+                src: 'build/saga.<%= pkg.version %>.js',
+                dest: 'build/saga.<%= pkg.version %>.min.js'
+            }
+        },
+        copy: {
+            main: {
+                files: [
+                    {
+                        src: ['build/saga.<%= pkg.version %>.min.js'],
+                        dest: 'build/saga.min.js'
+                    }
+                ]
             }
         },
         compass: { // Task
@@ -46,9 +81,11 @@ module.exports = function (grunt) {
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jst');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task(s).
     //grunt.registerTask('default', ['uglify']);
-    grunt.registerTask('default', ['compass']);
+    grunt.registerTask('default', ['concat', 'uglify','copy']);
 
 };

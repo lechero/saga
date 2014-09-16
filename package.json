@@ -1,6 +1,6 @@
 {
     "name": "SagaJS",
-    "version": "0.1.0",
+    "version": "0.1.5",
     "title": "Saga - Js - Javascript Framework",
     "description": "Javascript Framework, Utils, preload assets/content, show hide assets, ajax loader, dom functions, routing and much more!",
     "author": "Lechero lechero@sagajs.com (https://github.com/lechero/)",
@@ -21,6 +21,7 @@
         "grunt-contrib-uglify": "~0.4.0",
         "grunt-contrib-concat": "~0.4.0",
         "grunt-contrib-jst": "~0.6.0",
+        "grunt-contrib-copy": "~0.5.0",
         "grunt-contrib-compass": "~0.7.2"
     }
 }
