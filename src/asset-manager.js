@@ -19,7 +19,9 @@ Saga.AssetManager = (function () {
             return holders[name];
         },
         loadAssetDone = function (asset, cb) {
+            //alert("loadAssetDone: " + JSON.stringify(asset.loadStack()));
             asset.loadComplete();
+            //alert("loadAssetDone: " + JSON.stringify(asset.stack()));
             pub.fire(asset.name + ":loaded");
             if (cb) {
                 cb();
@@ -38,10 +40,18 @@ Saga.AssetManager = (function () {
                 });
 
             loadManager.load(urls, function () {
-                u.each(stack, function (item) {
+                
+                u.each(stack, function (item,id) { // TODO: IE loss of reference!?!?!?!
+                    stack[id].loaded = true;
+                    stack[id].content = loadManager.dir()[item.file];
+                    /*
                     item.loaded = true;
                     item.content = loadManager.dir()[item.file];
+                    */
                 });
+                // TODO: Figure out weirdness , references of stack in asset is lost? !?!?! why?! setting now but LAAAAMEEE 
+                asset.loadStack(stack); // -> i am totally missing something 
+                //alert("loadAsset: " + JSON.stringify(stack));
                 loadAssetDone(asset, cb);
             });
         },

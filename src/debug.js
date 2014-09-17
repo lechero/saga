@@ -12,16 +12,13 @@ Saga.Debug = (function () {
             return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
         },
         output = function (type) {
-
             if (util.contains(activeLevels, type)) {
                 var arg = Array.prototype.slice.call(arguments, 1);
                 arg.unshift(timestamp() + ": ");
-                //console.log(type, arg,console.log.apply(console,"test"));
                 try {
                     console[type].apply(console, arg);
                 } catch (err) {
                      console[type](arg.join(", "));
-                    //console.log("Saga.Debug.log() -> catch", err);
                 }
             } else {
                 console.log("No contains");

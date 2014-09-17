@@ -4,6 +4,18 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        removelogging: {
+            dist: {
+                src: "build/saga.<%= pkg.version %>.js",
+                dest: "build/saga.<%= pkg.version %>.clean.js",
+
+                options: {
+                    // see below for options. this is optional.
+                    namespace: ['debug'],
+                    methods: ['log', 'warn', 'info']
+                }
+            }
+        },
         concat: {
             options: {},
             dist: {
@@ -25,8 +37,7 @@ module.exports = function (grunt) {
                     'src/asset-manager.js',
                     'src/font-manager.js',
                     'src/keyboard.js',
-                    'src/graph.js',
-                    'src/abracadabra.js'
+                    'src/graph.js'
                 ],
                 dest: 'build/saga.<%= pkg.version %>.js'
             }
@@ -34,7 +45,7 @@ module.exports = function (grunt) {
         uglify: {
             options: {},
             build: {
-                src: 'build/saga.<%= pkg.version %>.js',
+                src: 'build/saga.<%= pkg.version %>.clean.js',
                 dest: 'build/saga.<%= pkg.version %>.min.js'
             }
         },
@@ -83,9 +94,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jst');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks("grunt-remove-logging");
 
     // Default task(s).
     //grunt.registerTask('default', ['uglify']);
-    grunt.registerTask('default', ['concat', 'uglify','copy']);
+    grunt.registerTask('default', ['concat', 'removelogging', 'uglify', 'copy']);
 
 };

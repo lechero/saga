@@ -11,7 +11,7 @@ Saga.Asset = function (assetName, assetInfo) {
         view = {},
         holder = false,
         content = {},
-       
+
         loadStack = [],
         stackObj = function (type, file, prop) {
             return {
@@ -58,6 +58,8 @@ Saga.Asset = function (assetName, assetInfo) {
             }
         },
         loadComplete = function () {
+            //alert("ASSET loadComplete:" + JSON.stringify(loadStack));
+            //alert("1:" +JSON.stringify(loadStack));
             u.each(loadStack, function (item) {
                 if (item.type === "template") {
                     if (item.prop === "") {
@@ -73,6 +75,7 @@ Saga.Asset = function (assetName, assetInfo) {
                     }
                 }
             });
+            //alert("2:" +JSON.stringify(content));
             loaded = true;
         };
 
@@ -82,7 +85,10 @@ Saga.Asset = function (assetName, assetInfo) {
         init: function (assetInfo) {
             init(assetInfo);
         },
-        loadStack: function () {
+        loadStack: function (val) {
+            if (arguments.length > 0) {
+                loadStack = val; // IE?!?!?1
+            }
             return loadStack;
         },
         loadComplete: function () {
