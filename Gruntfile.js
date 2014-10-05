@@ -37,7 +37,9 @@ module.exports = function (grunt) {
                     'src/asset-manager.js',
                     'src/font-manager.js',
                     'src/keyboard.js',
-                    'src/graph.js'
+                    'src/graph.js',
+                    'src/panorama.js',
+                    'src/slider.js'
                 ],
                 dest: 'build/saga.<%= pkg.version %>.js'
             }
