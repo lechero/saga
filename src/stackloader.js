@@ -82,6 +82,7 @@ Saga.StackLoader = function () {
     };
 
     loadItem = function () {
+        //debug.info("Saga.StackLoader.loadItem() -> ", stack.length);
         if (loading) {
             debug.info("Saga.StackLoader.loadItem() -> Already loading, waiting...");
             return;
@@ -97,7 +98,7 @@ Saga.StackLoader = function () {
 
         var file,
             ext;
-        //debug.info("Saga.StackLoader.loadItem() ->", stack[0]);
+        debug.log("Saga.StackLoader.loadItem() ->", stack[0]);
         if (u.isFunction(stack[0])) { // callback
             stack[0]();
             loadItemDone();

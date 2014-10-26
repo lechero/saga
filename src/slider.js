@@ -90,9 +90,32 @@ Saga.Slider = function (id, onDrag, percentage) {
         dragger.style.left = Math.round(rangeWidth * percentage) + 'px';
     }
 
-    range.addEventListener("mousedown", function (e) {
+    range.addEventListener("touchstart", function (e) {
+        debug.error("RANG TOUCH START", e)
+        if (e.target === dragger) {
+            touchStart.currentX = dragger.style.left.replace("px", "");
+            touchStart.x = e.pageX;
+            touchStart.y = e.pageY;
+            document.addEventListener("touchmove", mouseMove);
+            document.addEventListener("touchend", mouseUp);
+        }
+        if (e.target !== range) {
+            return;
+        }
 
-        //debug.log(e.target);
+        rangeWidth = this.offsetWidth;
+        rangeLeft = this.offsetLeft;
+        down = true;
+        /*
+        debug.log("OFFSET", rangeWidth, rangeLeft);
+        debug.log("POSt", e.pageX, e.layerX);
+        */
+        updateDragger(e);
+        return false;
+    });
+    
+    range.addEventListener("mousedown", function (e) {
+        
         if (e.target === dragger) {
             touchStart.currentX = dragger.style.left.replace("px", "");
             touchStart.x = e.pageX;

@@ -36,6 +36,7 @@ Saga.Dom = (function () {
             }
         },
         addClass = function (element, className) {
+            //console.trace("addClass", element, className);
             if (!hasClass(element, className)) {
                 element.className += " " + className;
             }

@@ -40,8 +40,8 @@ Saga.AssetManager = (function () {
                 });
 
             loadManager.load(urls, function () {
-                
-                u.each(stack, function (item,id) { // TODO: IE loss of reference!?!?!?!
+
+                u.each(stack, function (item, id) { // TODO: IE loss of reference!?!?!?!
                     stack[id].loaded = true;
                     stack[id].content = loadManager.dir()[item.file];
                     /*
@@ -127,7 +127,7 @@ Saga.AssetManager = (function () {
             try {
                 asset.View.init();
             } catch (er) {
-                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No INIT");
+                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No INIT", asset, er);
             }
             pub.fire(asset.name + ":inited");
 

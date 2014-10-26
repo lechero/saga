@@ -5,6 +5,7 @@ Saga.Debug = (function () {
     "use strict";
     var pub,
         util = Saga.Util,
+        outputDiv = false,
         levels = ["log", "info", "error", "warn", "trace"],
         activeLevels = ["log", "info", "warn", "error"],
         timestamp = function () {
@@ -12,13 +13,17 @@ Saga.Debug = (function () {
             return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
         },
         output = function (type) {
+            //return;
             if (util.contains(activeLevels, type)) {
                 var arg = Array.prototype.slice.call(arguments, 1);
                 arg.unshift(timestamp() + ": ");
                 try {
                     console[type].apply(console, arg);
                 } catch (err) {
-                     console[type](arg.join(", "));
+                    console[type](arg.join(", "));
+                }
+                if (outputDiv) {
+                    outputDiv.innerHTML = outputDiv.innerHTML + '<br>' + JSON.stringify(arg); // JSON.stringify(arg) + "<br>" + outputDiv.innerHTML;
                 }
             } else {
                 console.log("No contains");
@@ -49,7 +54,7 @@ Saga.Debug = (function () {
             arg.unshift('warn');
             output.apply(this, arg);
         };
-    
+
     if (Function.prototype.bind && window.console && typeof console.log === "object") {
         //http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
         console.log("debug reset console");
@@ -57,7 +62,7 @@ Saga.Debug = (function () {
             console[method] = this.bind(console[method], console);
         }, Function.prototype.call);
     }
-    
+
     //console.log("debug")
 
 
@@ -97,6 +102,12 @@ Saga.Debug = (function () {
             } else {
                 return activeLevels;
             }
+        },
+        div: function (val) {
+            if (arguments.length > 0) {
+                outputDiv = val;
+            }
+            return outputDiv;
         }
     };
     return pub;

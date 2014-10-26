@@ -12,6 +12,7 @@ Saga.Panorama = function (containerDiv, opts) {
     "use strict";
     var pub,
         extension = ".jpg",
+        mediaBase = "media/",
         /*
         WEST = "_3",
         NORTH = "_4",
@@ -210,7 +211,7 @@ Saga.Panorama = function (containerDiv, opts) {
                 }
             };
 
-            img.src = "media/pano/512/" + url;
+            img.src = mediaBase + "pano/512/" + url;
 
             element.appendChild(img);
 
@@ -584,6 +585,8 @@ Saga.Panorama = function (containerDiv, opts) {
 
         rect = cube.getClientRects()[0];
 
+        debug.log("Saga.Panorama.update()", cube, rect);
+
         offsetX = (rect.width - size) * 0.5; // * distanceFactor;
         offsetY = (rect.height - size) * 0.5;
 
@@ -758,6 +761,12 @@ Saga.Panorama = function (containerDiv, opts) {
                 'yaw': yaw,
                 'pitch': pitch
             };
+        },
+        mediaBase: function (val) {
+            if (arguments.length > 0) {
+                mediaBase = val;
+            }
+            return mediaBase;
         }
     };
 
