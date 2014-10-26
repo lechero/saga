@@ -170,6 +170,7 @@ Saga.Debug = (function () {
     "use strict";
     var pub,
         util = Saga.Util,
+        outputDiv = false,
         levels = ["log", "info", "error", "warn", "trace"],
         activeLevels = ["log", "info", "warn", "error"],
         timestamp = function () {
@@ -177,13 +178,17 @@ Saga.Debug = (function () {
             return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
         },
         output = function (type) {
+            //return;
             if (util.contains(activeLevels, type)) {
                 var arg = Array.prototype.slice.call(arguments, 1);
                 arg.unshift(timestamp() + ": ");
                 try {
                     console[type].apply(console, arg);
                 } catch (err) {
-                     console[type](arg.join(", "));
+                    console[type](arg.join(", "));
+                }
+                if (outputDiv) {
+                    outputDiv.innerHTML = outputDiv.innerHTML + '<br>' + JSON.stringify(arg); // JSON.stringify(arg) + "<br>" + outputDiv.innerHTML;
                 }
             } else {
                 console.log("No contains");
@@ -214,7 +219,7 @@ Saga.Debug = (function () {
             arg.unshift('warn');
             output.apply(this, arg);
         };
-    
+
     if (Function.prototype.bind && window.console && typeof console.log === "object") {
         //http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
         console.log("debug reset console");
@@ -222,7 +227,7 @@ Saga.Debug = (function () {
             console[method] = this.bind(console[method], console);
         }, Function.prototype.call);
     }
-    
+
     //console.log("debug")
 
 
@@ -262,6 +267,12 @@ Saga.Debug = (function () {
             } else {
                 return activeLevels;
             }
+        },
+        div: function (val) {
+            if (arguments.length > 0) {
+                outputDiv = val;
+            }
+            return outputDiv;
         }
     };
     return pub;
@@ -691,6 +702,7 @@ Saga.Dom = (function () {
             }
         },
         addClass = function (element, className) {
+            //console.trace("addClass", element, className);
             if (!hasClass(element, className)) {
                 element.className += " " + className;
             }
@@ -1801,6 +1813,7 @@ Saga.StackLoader = function () {
     };
 
     loadItem = function () {
+        //debug.info("Saga.StackLoader.loadItem() -> ", stack.length);
         if (loading) {
             debug.info("Saga.StackLoader.loadItem() -> Already loading, waiting...");
             return;
@@ -1816,7 +1829,7 @@ Saga.StackLoader = function () {
 
         var file,
             ext;
-        //debug.info("Saga.StackLoader.loadItem() ->", stack[0]);
+        debug.log("Saga.StackLoader.loadItem() ->", stack[0]);
         if (u.isFunction(stack[0])) { // callback
             stack[0]();
             loadItemDone();
@@ -1923,8 +1936,8 @@ Saga.AssetManager = (function () {
                 });
 
             loadManager.load(urls, function () {
-                
-                u.each(stack, function (item,id) { // TODO: IE loss of reference!?!?!?!
+
+                u.each(stack, function (item, id) { // TODO: IE loss of reference!?!?!?!
                     stack[id].loaded = true;
                     stack[id].content = loadManager.dir()[item.file];
                     /*
@@ -2010,7 +2023,7 @@ Saga.AssetManager = (function () {
             try {
                 asset.View.init();
             } catch (er) {
-                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No INIT");
+                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No INIT", asset, er);
             }
             pub.fire(asset.name + ":inited");
 
@@ -2398,6 +2411,7 @@ Saga.Panorama = function (containerDiv, opts) {
     "use strict";
     var pub,
         extension = ".jpg",
+        mediaBase = "media/",
         /*
         WEST = "_3",
         NORTH = "_4",
@@ -2596,7 +2610,7 @@ Saga.Panorama = function (containerDiv, opts) {
                 }
             };
 
-            img.src = "media/pano/512/" + url;
+            img.src = mediaBase + "pano/512/" + url;
 
             element.appendChild(img);
 
@@ -2970,6 +2984,8 @@ Saga.Panorama = function (containerDiv, opts) {
 
         rect = cube.getClientRects()[0];
 
+        debug.log("Saga.Panorama.update()", cube, rect);
+
         offsetX = (rect.width - size) * 0.5; // * distanceFactor;
         offsetY = (rect.height - size) * 0.5;
 
@@ -3144,6 +3160,12 @@ Saga.Panorama = function (containerDiv, opts) {
                 'yaw': yaw,
                 'pitch': pitch
             };
+        },
+        mediaBase: function (val) {
+            if (arguments.length > 0) {
+                mediaBase = val;
+            }
+            return mediaBase;
         }
     };
 
@@ -3243,9 +3265,34 @@ Saga.Slider = function (id, onDrag, percentage) {
         dragger.style.left = Math.round(rangeWidth * percentage) + 'px';
     }
 
-    range.addEventListener("mousedown", function (e) {
+    debug.error("NEW SLIDER");
+    
+    range.addEventListener("touchstart", function (e) {
+        debug.error("RANG TOUCH START", e);
+        if (e.target === dragger) {
+            touchStart.currentX = dragger.style.left.replace("px", "");
+            touchStart.x = e.pageX;
+            touchStart.y = e.pageY;
+            document.addEventListener("touchmove", mouseMove);
+            document.addEventListener("touchend", mouseUp);
+        }
+        if (e.target !== range) {
+            return;
+        }
 
-        //debug.log(e.target);
+        rangeWidth = this.offsetWidth;
+        rangeLeft = this.offsetLeft;
+        down = true;
+        /*
+        debug.log("OFFSET", rangeWidth, rangeLeft);
+        debug.log("POSt", e.pageX, e.layerX);
+        */
+        updateDragger(e);
+        return false;
+    });
+    
+    range.addEventListener("mousedown", function (e) {
+        
         if (e.target === dragger) {
             touchStart.currentX = dragger.style.left.replace("px", "");
             touchStart.x = e.pageX;

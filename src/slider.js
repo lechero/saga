@@ -17,6 +17,7 @@ Saga.Slider = function (id, onDrag, percentage) {
             y: 0
         },
         updateDragger = function (e) {
+            debug.error("updateDragger", e, e.layerX);
             //if (e.hasOwnProperty('layerX')) {
             if (e.layerX) {
                 if (down) {
@@ -90,16 +91,19 @@ Saga.Slider = function (id, onDrag, percentage) {
         dragger.style.left = Math.round(rangeWidth * percentage) + 'px';
     }
 
+    debug.error("NEW SLIDER");
+
     range.addEventListener("touchstart", function (e) {
-        debug.error("RANG TOUCH START", e)
+        debug.error("RANGE TOUCH START", e, e.target, range);
         if (e.target === dragger) {
             touchStart.currentX = dragger.style.left.replace("px", "");
             touchStart.x = e.pageX;
             touchStart.y = e.pageY;
-            document.addEventListener("touchmove", mouseMove);
-            document.addEventListener("touchend", mouseUp);
+            document.addEventListener("touchmove", touchMove);
+            document.addEventListener("touchend", touchUp);
         }
         if (e.target !== range) {
+            debug.error("TARGET AINT RANGE");
             return;
         }
 
@@ -110,12 +114,12 @@ Saga.Slider = function (id, onDrag, percentage) {
         debug.log("OFFSET", rangeWidth, rangeLeft);
         debug.log("POSt", e.pageX, e.layerX);
         */
-        updateDragger(e);
+        updateDraggerTouch(e);
         return false;
     });
-    
+
     range.addEventListener("mousedown", function (e) {
-        
+
         if (e.target === dragger) {
             touchStart.currentX = dragger.style.left.replace("px", "");
             touchStart.x = e.pageX;
