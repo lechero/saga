@@ -3192,10 +3192,9 @@ Saga.Slider = function (id, onDrag, percentage) {
             y: 0
         },
         updateDragger = function (e) {
-            //if (e.hasOwnProperty('layerX')) {
+            debug.error("updateDragger", e, e.layerX);
             if (e.layerX) {
                 if (down) {
-                    //debug.error("!!",e.layerX, (e.layerX - draggerWidth))
                     var newX = e.layerX - draggerWidth;
                     dragger.style.left = e.layerX - draggerWidth + 'px';
 
@@ -3205,7 +3204,6 @@ Saga.Slider = function (id, onDrag, percentage) {
                     if (newX > rangeWidth - (draggerWidth)) {
                         newX = rangeWidth - (draggerWidth);
                     }
-                    //if (newX >= (0) && newX <= rangeWidth - (draggerWidth)) {
                     dragger.style.left = newX + "px";
                     currentX = newX;
                     if (typeof onDrag === "function") {
@@ -3213,18 +3211,9 @@ Saga.Slider = function (id, onDrag, percentage) {
                     }
                 }
             }
-            /*else if (down && e.pageX >= rangeLeft && e.pageX <= (rangeLeft + rangeWidth)) {
-                dragger.style.left = e.pageX - rangeLeft - draggerWidth + 'px';
-                if (typeof onDrag === "function") {
-                    //onDrag(Math.round(((e.pageX - rangeLeft) / rangeWidth) * 100));
-                    onDrag(Math.round(((e.pageX - rangeLeft) / rangeWidth)));
-                }
-            }*/
         },
         mouseMove = function (e) {
             var newX = Number(touchStart.currentX) + e.pageX - touchStart.x;
-            //debug.error("mm", touchStart.currentX, e.pageX, touchStart.x, e.pageX - touchStart.x, newX, rangeWidth);
-
 
             if (newX < 0) {
                 newX = 0;
@@ -3232,20 +3221,66 @@ Saga.Slider = function (id, onDrag, percentage) {
             if (newX > rangeWidth - (draggerWidth)) {
                 newX = rangeWidth - (draggerWidth);
             }
-            //if (newX >= (0) && newX <= rangeWidth - (draggerWidth)) {
             dragger.style.left = newX + "px";
             currentX = newX;
             if (typeof onDrag === "function") {
                 onDrag(Math.round((newX / (rangeWidth - draggerWidth)) * 100) / 100);
             }
-            //}
-
-            //dragger.style.left
         },
         mouseUp = function () {
             down = false;
             document.removeEventListener("mousemove", mouseMove);
             document.removeEventListener("mouseup", mouseUp);
+        },
+        updateDraggerTouch = function (e) {
+
+            var touch = e.touches[0],
+                rect = range.getBoundingClientRect(),
+                newX;
+
+            debug.error("updateDragger", rect);
+            //if (e.layerX) {
+            if (down) {
+                newX = touch.pageX - rect.left - draggerWidth;
+                dragger.style.left = newX + 'px';
+
+                debug.error("NEW X 1: ", newX);
+
+                if (newX < 0) {
+                    newX = 0;
+                }
+                if (newX > rangeWidth - (draggerWidth)) {
+                    newX = rangeWidth - (draggerWidth);
+                }
+
+                debug.error("NEW X 2: ", newX);
+                dragger.style.left = newX + "px";
+                currentX = newX;
+                if (typeof onDrag === "function") {
+                    onDrag(Math.round((newX / (rangeWidth - draggerWidth)) * 100) / 100);
+                }
+            }
+            //}
+        },
+        touchMove = function (e) {
+            var newX = Number(touchStart.currentX) + e.pageX - touchStart.x;
+
+            if (newX < 0) {
+                newX = 0;
+            }
+            if (newX > rangeWidth - (draggerWidth)) {
+                newX = rangeWidth - (draggerWidth);
+            }
+            dragger.style.left = newX + "px";
+            currentX = newX;
+            if (typeof onDrag === "function") {
+                onDrag(Math.round((newX / (rangeWidth - draggerWidth)) * 100) / 100);
+            }
+        },
+        touchUp = function () {
+            down = false;
+            document.removeEventListener("touchmove", touchMove);
+            document.removeEventListener("touchend", touchUp);
         };
 
     debug.log("Saga.Slider(" + id + ")");
@@ -3266,17 +3301,19 @@ Saga.Slider = function (id, onDrag, percentage) {
     }
 
     debug.error("NEW SLIDER");
-    
+
     range.addEventListener("touchstart", function (e) {
-        debug.error("RANG TOUCH START", e);
+        debug.error("RANGE TOUCH START", e, e.target, range);
+        var touch = e.touches[0];
         if (e.target === dragger) {
             touchStart.currentX = dragger.style.left.replace("px", "");
-            touchStart.x = e.pageX;
-            touchStart.y = e.pageY;
-            document.addEventListener("touchmove", mouseMove);
-            document.addEventListener("touchend", mouseUp);
+            touchStart.x = touch.pageX;
+            touchStart.y = touch.pageY;
+            document.addEventListener("touchmove", touchMove);
+            document.addEventListener("touchend", touchUp);
         }
         if (e.target !== range) {
+            debug.error("TARGET AINT RANGE");
             return;
         }
 
@@ -3287,12 +3324,12 @@ Saga.Slider = function (id, onDrag, percentage) {
         debug.log("OFFSET", rangeWidth, rangeLeft);
         debug.log("POSt", e.pageX, e.layerX);
         */
-        updateDragger(e);
+        updateDraggerTouch(e);
         return false;
     });
-    
+
     range.addEventListener("mousedown", function (e) {
-        
+
         if (e.target === dragger) {
             touchStart.currentX = dragger.style.left.replace("px", "");
             touchStart.x = e.pageX;
