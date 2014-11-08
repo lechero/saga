@@ -316,7 +316,7 @@ Saga.Panorama = function (containerDiv, opts) {
             /*
             cube.addEventListener("mousedown", onDown);
             cube.addEventListener("touchstart", onDown);
-*/
+            */
             lastPosition = [0, 0];
 
             center = document.createElement("div");
@@ -331,38 +331,6 @@ Saga.Panorama = function (containerDiv, opts) {
             update();
         },
 
-        //        http://stackoverflow.com/questions/3432446/how-to-read-individual-webkit-transform-values-in-javascript
-        //        
-        //        // Suppose the transformed element is called "cover".
-        //        var element = document.getElementById('cover');
-        //        computedStyle = window.getComputedStyle(element, null); // "null" means this is not a pesudo style.
-        //        // You can retrieve the CSS3 matrix string by the following method.
-        //        var matrix = computedStyle.getPropertyValue('transform')
-        //            || computedStyle.getPropertyValue('-moz-transform')
-        //            || computedStyle.getPropertyValue('-webkit-transform')
-        //            || computedStyle.getPropertyValue('-ms-transform')
-        //            || computedStyle.getPropertyValue('-o-transform');
-        //
-        //        // Parse this string to obtain different attributes of the matrix.
-        //        // This regexp matches anything looks like this: anything(1, 2, 3, 4, 5, 6);
-        //        // Hence it matches both matrix strings:
-        //        // 2d: matrix(1,2,3,4,5,6)
-        //        // 3d: matrix3d(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
-        //        var matrixPattern = /^\w*\((((\d+)|(\d*\.\d+)),\s*)*((\d+)|(\d*\.\d+))\)/i;
-        //        var matrixValue = [];
-        //        if (matrixPattern.test(matrix)) { // When it satisfy the pattern.
-        //            var matrixCopy = matrix.replace(/^\w*\(/, '').replace(')', '');
-        //            console.log(matrixCopy);
-        //            matrixValue = matrixCopy.split(/\s*,\s*/);
-        //        }
-        /*
- matrix3d(
-     0.653719, 0.00114096, -0.756737, 0, 
-     -0.00174533,  0.999998, 0, 0, 
-     0.756736, 0.00132075, 0.65372, 0, 
-     -36.3971,-121.064, 242.377, 1
- )
-*/
         parseMatrix = function (matrixString) {
             var c = matrixString.split(/\s*[(),]\s*/).slice(1, -1),
                 matrix;
