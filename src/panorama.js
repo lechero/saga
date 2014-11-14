@@ -1,5 +1,5 @@
 /*jslint browser:true*/
-/*global App, Saga*/
+/*global App, Saga, TweenLite*/
 /*
 App.RIGHT = "test0001.jpeg";
 App.LEFT = "test0003.jpeg";
@@ -13,6 +13,8 @@ Saga.Panorama = function (containerDiv, opts) {
     var pub,
         extension = ".jpg",
         mediaBase = "media/",
+
+        tween = false,
         /*
         WEST = "_3",
         NORTH = "_4",
@@ -97,7 +99,129 @@ Saga.Panorama = function (containerDiv, opts) {
             transitionTime(center, time);
             center.style.opacity = 0;
         },
+        zoomUpdate = function (obj) { // rewrite so can be used with rotation
+            debug.error("zoomUpdate", obj.distance);
+            var distance = perspective,
+                distanceFactor = obj.distance || 1,
+                rect,
+                offsetX,
+                offsetY,
+                rotation = obj.rotateY || yaw,
+                transform;
+
+            yaw = rotation;
+
+            cube.style.perspective = perspective.toFixed(0) + "px";
+            cube.style.webkitPerspective = perspective + "px";
+            cube.style.mozPerspective = perspective + "px";
+
+            rect = cube.getClientRects()[0];
+
+            //debug.log("Saga.Panorama.update()", cube, rect);
+
+            offsetX = (rect.width - size) * 0.5; // * distanceFactor;
+            offsetY = (rect.height - size) * 0.5;
+
+            depth = offsetX;
+
+            //debug.log("Saga.Panorama.update()", yaw, pitch);
+
+            if (pitch > maxTop) {
+                pitch = maxTop;
+            }
+            if (pitch < maxBottom) {
+                pitch = maxBottom;
+            }
+
+            transform = "translateZ(" + (distance * distanceFactor) + "px) rotateX(" + pitch.toFixed(1) + "deg) rotateZ(0.1deg) rotateY(" + (rotation + angleOffset).toFixed(1) + "deg) translateX(" + offsetX + "px) translateY(" + offsetY + "px)";
+            center.style.transform = transform;
+            center.style.webkitTransform = transform;
+            center.style.mozTransform = transform;
+        },
+        zoomIn = function (duration) {
+            /*
+                set initial opacity + distance
+                tween
+            */
+
+            var obj = {
+                opacity: 0,
+                opacityFrom: 0,
+                opacityTo: 1,
+                distance: 0.5,
+                distanceFrom: 0.5,
+                distanceTo: 1
+            };
+
+            zoomUpdate(obj);
+
+            TweenLite.set(obj, {
+                css: {
+                    autoAlpha: obj.opacity
+                }
+            });
+
+            tween = TweenLite.to(obj, duration / 1000, {
+                opacity: obj.opacityTo,
+                distance: obj.distance,
+                onUpdate: function () {
+                    zoomUpdate(obj);
+                }
+            });
+
+        },
+        zoomOut = function (duration) {
+
+            var obj = {
+                opacity: 1,
+                opacityFrom: 1,
+                opacityTo: 0,
+                distance: 2,
+                distanceFrom: 2,
+                distanceTo: 1
+            };
+
+            zoomUpdate(obj);
+
+            TweenLite.set(obj, {
+                css: {
+                    autoAlpha: obj.opacity
+                }
+            });
+
+            tween = TweenLite.to(obj, duration / 1000, {
+                opacity: obj.opacityTo,
+                onUpdate: function () {
+                    zoomUpdate(obj);
+                }
+            });
+
+        },
         zoom = function (factor, duration, opacity) {
+            debug.error("SAGA.Panorama.zoom()", factor, opacity, duration);
+            //return;
+            var currentOpacity = 0,
+                obj = {
+                    distance: factor,
+                    opacity: currentOpacity
+                },
+                zoomPanorama = function () {
+                    center.style.opacity = obj.opacity;
+                    //update();
+                };
+
+            if (opacity == 0) {
+                currentOpacity = 1;
+            }
+
+            obj.opacity = currentOpacity;
+
+            tween = TweenLite.to(obj, duration / 1000, {
+                opacity: opacity,
+                onUpdate: zoomPanorama
+            });
+
+            /*
             if (duration || duration === 0) {
                 transitionTime(center, duration);
             }
@@ -107,45 +231,103 @@ Saga.Panorama = function (containerDiv, opts) {
                 center.style.opacity = opacity;
             }
             update();
+            */
         },
-        rotate = function (deg, duration) {
+        rotate = function (deg, duration, cb) {
+            //debug.error("SAGA.Panorama.rotate()", deg, duration);
+            //return;
+            //transitionTime(center, 0);
+            //yaw = u.getShortestRotation(yaw, deg);
+
+
+            var obj = {
+                    rotateY: yaw,
+                    rotateYFrom: yaw,
+                    rotateYTo: u.getShortestRotation(yaw, deg)
+                },
+                rotatePanorama = function () {
+                    //debug.error("rotatePanorama", obj.rotateY, obj.rotateYFrom, obj.rotateYTo);
+
+
+                    var distance = perspective,
+                        rect,
+                        offsetX,
+                        offsetY,
+                        rotation = obj.rotateY,
+                        transform;
+
+                    yaw = rotation;
+
+                    cube.style.perspective = perspective.toFixed(0) + "px";
+                    cube.style.webkitPerspective = perspective + "px";
+                    cube.style.mozPerspective = perspective + "px";
+
+                    rect = cube.getClientRects()[0];
+
+                    //debug.log("Saga.Panorama.update()", cube, rect);
+
+                    offsetX = (rect.width - size) * 0.5; // * distanceFactor;
+                    offsetY = (rect.height - size) * 0.5;
+
+                    depth = offsetX;
+
+                    //debug.log("Saga.Panorama.update()", yaw, pitch);
+
+                    if (pitch > maxTop) {
+                        pitch = maxTop;
+                    }
+                    if (pitch < maxBottom) {
+                        pitch = maxBottom;
+                    }
+
+                    transform = "translateZ(" + (distance * distanceFactor) + "px) rotateX(" + pitch.toFixed(1) + "deg) rotateZ(0.1deg) rotateY(" + (rotation + angleOffset).toFixed(1) + "deg) translateX(" + offsetX + "px) translateY(" + offsetY + "px)";
+                    center.style.transform = transform;
+                    center.style.webkitTransform = transform;
+                    center.style.mozTransform = transform;
+                };
+
+            tween = TweenLite.to(obj, duration / 1000, {
+                rotateY: obj.rotateYTo,
+                onUpdate: rotatePanorama,
+                onComplete: cb
+            });
+
+            return;
+
+
+            /*
+            pub.fire("update", {
+                distance: distance,
+                rotateX: pitch.toFixed(1),
+                rotateY: yaw.toFixed(1),
+                angleOffset: angleOffset
+            });
+            */
+
+            /*
             var distance = perspective,
                 rect,
                 offsetX,
                 offsetY,
                 transform;
-
-            //deg = -deg;
-            // u.getShortestRotation(angle, u.angleToPoint(point1, point2))
-            //debug.error("Saga.Panorama.rotate() -> time: " + yaw, deg, u.getShortestRotation(yaw, deg));
+            
             if (duration || duration === 0) {
                 transitionTime(center, duration);
             }
 
-            yaw = u.getShortestRotation(yaw, deg); //+ rotationOffset;
+            yaw = u.getShortestRotation(yaw, deg);
             pitch = 0;
             update();
-
-            /*
-            cube.style.perspective = perspective.toFixed(0) + "px";
-            cube.style.webkitPerspective = perspective + "px";
-            cube.style.mozPerspective = perspective + "px";
-
-            rect = cube.getClientRects()[0];
-            offsetX = (rect.width - size) * 0.5;
-            offsetY = (rect.height - size) * 0.5;
-            transform = "translateZ(" + distance + "px) rotateX(" + pitch.toFixed(1) + "deg) rotateY(" + deg + "deg) translateX(" + offsetX + "px) translateY(" + offsetY + "px)";
-            center.style.transform = transform;
-            center.style.webkitTransform = transform;
-            center.style.mozTransform = transform;
-
-            pub.fire("rotate", {
-                distance: distance,
-                rotateX: pitch.toFixed(1),
-                rotateY: deg,
-                yaw: yaw.toFixed(1)
-            });
             */
+
+            //var tween = TweenLite.to(demo, 20, {score:100, onUpdate:showScore})
+        },
+        pause = function () {
+            if (tween) {
+                tween.pause();
+            }
+
+            return yaw;
         },
         buildFace = function (face, url, cb) {
             // debug.log("Saga.Panorama.buildFace()", face, url);
@@ -255,6 +437,7 @@ Saga.Panorama = function (containerDiv, opts) {
             buildFace("bottom", pano + BOTTOM + extension, loadDone);
             buildFace("back", pano + WEST + extension, loadDone);
 */
+            //debug.error("Saga.Panorama.load() -> updating");
             update();
 
             /*
@@ -328,6 +511,7 @@ Saga.Panorama = function (containerDiv, opts) {
             center.style.width = "100%";
             center.style.height = "100%";
 
+            //debug.error("Saga.Panorama.init() -> updating: ", container);
             update();
         },
 
@@ -423,7 +607,7 @@ Saga.Panorama = function (containerDiv, opts) {
             angleZ = Math.round(Math.atan(tArray[2]) * (180 / Math.PI));
             // var angle = Math.round(Math.asin(b) * (180/Math.PI));
 
-            debug.error("Panorama - SAGA", "getTransformValues", tArray, tArray.length, angleX, angleY, angleZ, angleOffset);
+            //debug.error("Panorama - SAGA", "getTransformValues", tArray, tArray.length, angleX, angleY, angleZ, angleOffset);
             return angleY - angleOffset;
         },
         getTransform = function () {
@@ -460,8 +644,11 @@ Saga.Panorama = function (containerDiv, opts) {
             //debug.error("Panorama - SAGA", "ffTest", matrix, rotate);
             //getTransformValues(transform);
         },
-        pause = function () {
+        pause2 = function () {
+            tween.pause();
+            return yaw;
 
+            /*
             var style = window.getComputedStyle(center),
                 transform,
                 opacity = 0,
@@ -517,6 +704,7 @@ Saga.Panorama = function (containerDiv, opts) {
             }
 
             return angleY;
+            */
         },
         resume = function () {
 
@@ -532,20 +720,14 @@ Saga.Panorama = function (containerDiv, opts) {
 
 
     update = function () {
-        //debug.log("Saga.Panorama.update()");
-        //var perspective = this.perspective;
-        //perspective = 100 / Math.atan(0.0174532925 * this.fov);
+        //debug.error("Saga.Panorama.update()", containerDiv.id, cube);
+        //return;
         var distance = perspective,
             rect,
             offsetX,
             offsetY,
             transform;
-        /*
-            if (!rect) {
-                //debug.error("Saga.Panorama.update() -> no rectangle!!!");
-                return;
-            }
-            */
+
         //trace(perspective+" / ");
         cube.style.perspective = perspective.toFixed(0) + "px";
         cube.style.webkitPerspective = perspective + "px";
@@ -646,6 +828,7 @@ Saga.Panorama = function (containerDiv, opts) {
         pitch += deltay * speed;
 
         //debug.log("move x,y: " + x + "," + y + " : " + deltax + "," + deltay + " : " + yaw + "," + pitch);
+        //debug.error("Saga.Panorama.onMove() -> updating");
         update();
 
         /*
@@ -689,11 +872,17 @@ Saga.Panorama = function (containerDiv, opts) {
         load: function (pano, angle, cb) {
             load(pano, angle, cb);
         },
-        rotate: function (deg, duration) {
-            rotate(deg, duration);
+        rotate: function (deg, duration, cb) {
+            rotate(deg, duration, cb);
         },
         zoom: function (deg, duration, opacity) {
             zoom(deg, duration, opacity);
+        },
+        zoomIn: function (duration) {
+            zoomIn(duration);
+        },
+        zoomOut: function (duration) {
+            zoomOut(duration);
         },
         rotation: function () {
             return parseFloat(yaw.toFixed(1));
@@ -702,6 +891,7 @@ Saga.Panorama = function (containerDiv, opts) {
             return container;
         },
         update: function () {
+            //debug.error("Saga.Panorama.pub.update() -> updating");
             update();
         },
         setRotationOffset: function (offset) {
@@ -718,6 +908,7 @@ Saga.Panorama = function (containerDiv, opts) {
             transitionTime(center, 0);
         },
         setDistance: function (factor) { // setter for zoom
+            debug.error("Saga.Panorama.pub.setDistance() -> updating");
             distanceFactor = factor;
             update();
         },

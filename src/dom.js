@@ -389,7 +389,7 @@ Saga.Dom = (function () {
             if (obj4) {
                 u.extend(styles, obj4);
             }
-            //debug.info("Saga.Dom.setStyles() -> Applying: ", elem, styles);
+            debug.info("Saga.Dom.setStyles() -> Applying: ", elem, styles);
             u.each(styles, function (value, style) {
                 // test
                 style = toCamelCase(style);
