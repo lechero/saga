@@ -1841,7 +1841,7 @@ Saga.StackLoader = function () {
                     loaded[file] = script;
                     loadItemDone();
                 });
-            } else if (ext === "png" || ext === "gif" || ext === "jpg" || ext === "jpeg") {
+            } else if (ext === "png" || ext === "gif" || ext === "jpg" || ext === "jpeg" || ext === "svg") {
                 loadImage(file, function (img) {
                     loaded[file] = img;
                     loadItemDone();
