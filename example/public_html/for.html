@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>SagaJS - Example - September 2014</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script id="saga" src="../../build/saga.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="app/css/saga-bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="app/css/example.css">
+
+</head>
+
+<body>
+    <script>
+        var u = Saga.Util,
+            arr = [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+            ],
+            obj = {
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6"
+            }
+
+        
+        for (var i = 0; i < arr.length; i += 1) {
+            console.log(i, arr[i]);
+        }
+        
+        
+        u.each(arr, function(value,index){
+            console.log(index, value);
+        })
+        
+        u.each(obj, function(value,index){
+            console.log(index, value);
+        });
+        
+        var bla = (function(){
+            var lala = "ble"
+        }());
+    </script>
+</body>
+
+</html>
