@@ -83,6 +83,17 @@ Saga.AssetManager = (function () {
                 pub.fire(asset.name + ":removed");
                 debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
             }
+            
+            debug.info("Saga.AssetManager.remove() -> CLEARING HOLDER", asset);
+            
+            
+            try {
+                asset.Holder.remove();
+                //pub.fire(asset.name + ":removed");
+            } catch (err) {
+                //pub.fire(asset.name + ":removed");
+                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
+            }
 
             try {
                 asset.Js().parentNode.removeChild(asset.Js());

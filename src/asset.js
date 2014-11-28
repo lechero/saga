@@ -22,6 +22,7 @@ Saga.Asset = function (assetName, assetInfo) {
                 'prop': prop
             };
         },
+        
         addLoad = function (type, obj) {
             if (u.isString(obj)) {
                 content[type] = false;

@@ -237,7 +237,7 @@ Saga.Panorama = function (containerDiv, opts) {
             });
             */
 
-            //debug.error("zoomIn: ", time);
+           // debug.error("zoomIn: ", time);
             zoomUpdate(obj);
 
             oTween = TweenLite.to(center, time, {

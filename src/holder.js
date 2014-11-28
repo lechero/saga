@@ -19,14 +19,21 @@ Saga.Holder = function (holderDivName) {
 
             return true;
         },
+        
         setAsset = function (newAsset) {
             asset = newAsset;
             div = document.getElementById(divName);
             div.innerHTML = asset.saga.html[0];
             return true;
+        },
+        remove = function () {
+            div.innerHTML = "";
         };
 
     pub = {
+        remove: function () {
+            remove();
+        },
         place: function (asset) {
             place(asset);
         },
