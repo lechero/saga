@@ -1507,14 +1507,21 @@ Saga.Holder = function (holderDivName) {
 
             return true;
         },
+        
         setAsset = function (newAsset) {
             asset = newAsset;
             div = document.getElementById(divName);
             div.innerHTML = asset.saga.html[0];
             return true;
+        },
+        remove = function () {
+            div.innerHTML = "";
         };
 
     pub = {
+        remove: function () {
+            remove();
+        },
         place: function (asset) {
             place(asset);
         },
@@ -1554,6 +1561,7 @@ Saga.Asset = function (assetName, assetInfo) {
                 'prop': prop
             };
         },
+        
         addLoad = function (type, obj) {
             if (u.isString(obj)) {
                 content[type] = false;
@@ -1977,6 +1985,17 @@ Saga.AssetManager = (function () {
                 pub.fire(asset.name + ":removed");
             } catch (err) {
                 pub.fire(asset.name + ":removed");
+                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
+            }
+            
+            debug.info("Saga.AssetManager.remove() -> CLEARING HOLDER", asset);
+            
+            
+            try {
+                asset.Holder.remove();
+                //pub.fire(asset.name + ":removed");
+            } catch (err) {
+                //pub.fire(asset.name + ":removed");
                 debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
             }
 
@@ -2636,7 +2655,7 @@ Saga.Panorama = function (containerDiv, opts) {
             });
             */
 
-            //debug.error("zoomIn: ", time);
+           // debug.error("zoomIn: ", time);
             zoomUpdate(obj);
 
             oTween = TweenLite.to(center, time, {
