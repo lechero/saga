@@ -2627,9 +2627,9 @@ Saga.Panorama = function (containerDiv, opts) {
 
         },
         pause = function () {
-            //debug.error("Saga.Panorama.pause()", tween, oTween);
+            debug.error("Saga.Panorama.pause()", tween, oTween);
             if (tween) {
-                //debug.error("Saga.Panorama.pause() !!!! doing!!!", tween, oTween);
+                debug.error("Saga.Panorama.pause() !!!! doing!!!", tween, oTween);
                 tween.pause();
             }
 
@@ -2800,14 +2800,17 @@ Saga.Panorama = function (containerDiv, opts) {
                 rotateIe(deg, duration, cb);
                 return;
             }
+            debug.error("rotate");
             var obj = {
                     rotateY: yaw,
                     rotateYFrom: yaw,
                     rotateYTo: u.getShortestRotation(yaw, deg)
                 },
                 rotatePanorama = function () {
-                    ////debug.error("rotatePanorama", obj.rotateY, obj.rotateYFrom, obj.rotateYTo);
-
+                    debug.error("rotatePanorama", obj.rotateY, obj.rotateYFrom, obj.rotateYTo, tween.paused());
+                    if(tween.paused()){
+                        return;
+                    }
 
                     var distance = perspective,
                         rect,

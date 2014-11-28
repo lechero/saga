@@ -389,7 +389,7 @@ Saga.Panorama = function (containerDiv, opts) {
                     rotateYTo: u.getShortestRotation(yaw, deg)
                 },
                 rotatePanorama = function () {
-                    debug.error("rotatePanorama", obj.rotateY, obj.rotateYFrom, obj.rotateYTo, tween.paused());
+                    //debug.error("rotatePanorama", obj.rotateY, obj.rotateYFrom, obj.rotateYTo, tween.paused());
                     if(tween.paused()){
                         return;
                     }
