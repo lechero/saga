@@ -83,13 +83,14 @@ Saga.AssetManager = (function () {
                 pub.fire(asset.name + ":removed");
                 debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
             }
-            
+
             debug.info("Saga.AssetManager.remove() -> CLEARING HOLDER", asset);
-            
-            
+
+
             try {
                 asset.Holder.remove();
                 //pub.fire(asset.name + ":removed");
+                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> REMOVED !!!!");
             } catch (err) {
                 //pub.fire(asset.name + ":removed");
                 debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
@@ -97,9 +98,10 @@ Saga.AssetManager = (function () {
 
             try {
                 asset.Js().parentNode.removeChild(asset.Js());
+                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> JS REMOVED !!!!");
             } catch (errr) {
                 //pub.fire(asset.name + ":removed");
-                //debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
+                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
             }
 
         },
@@ -136,7 +138,9 @@ Saga.AssetManager = (function () {
 
             asset.Holder.place(asset);
             try {
+                //debug.warn("Saga.AssetManager.place('" + asset.name + "') -> INITING");
                 asset.View.init();
+                //debug.warn("Saga.AssetManager.place('" + asset.name + "') -> INIT");
             } catch (er) {
                 debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No INIT", asset, er);
             }
@@ -152,7 +156,7 @@ Saga.AssetManager = (function () {
             }
         },
         show = function (asset) {
-            debug.info("Saga.AssetManager.show -> ", asset, asset.Holder);
+            debug.info("Saga.AssetManager.show(" + asset.name + ") -> ", asset, asset.Holder, asset.Holder.asset());
 
             if (asset.Holder && asset.Holder.asset()) {
                 debug.info("Saga.AssetManager.show -> hiding", asset.Holder.asset());

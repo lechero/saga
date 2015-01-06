@@ -16,6 +16,8 @@ Saga.Holder = function (holderDivName) {
             div.innerHTML = asset.Html();
 
             d.head().appendChild(asset.Js());
+            
+            //debug.error("Saga.Holder.place() PLACED", newAsset);
 
             return true;
         },
@@ -28,6 +30,7 @@ Saga.Holder = function (holderDivName) {
         },
         remove = function () {
             div.innerHTML = "";
+            asset = false;
         };
 
     pub = {
