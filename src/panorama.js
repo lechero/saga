@@ -384,7 +384,9 @@ Saga.Panorama = function (containerDiv, opts) {
             });
         },
         rotate = function (deg, duration, cb) {
-            //////debug.error("ROTATE : ", deg);
+
+            debug.error("ROTATE : ", yaw, " to ", deg);
+
             pitch = defaultPitch;
             if (ie) {
                 rotateIe(deg, duration, cb);
@@ -397,7 +399,7 @@ Saga.Panorama = function (containerDiv, opts) {
                     rotateYTo: u.getShortestRotation(yaw, deg)
                 },
                 rotatePanorama = function () {
-                    //////debug.error("rotatePanorama", obj.rotateY, obj.rotateYFrom, obj.rotateYTo, tween.paused());
+                    debug.warn("rotatePanorama", yaw, obj.rotateY);
                     if (tween.paused()) {
                         return;
                     }
@@ -631,9 +633,12 @@ Saga.Panorama = function (containerDiv, opts) {
                 buildFunction = buildFaceIe;
             }
 
+
             if (angle || angle === 0) {
                 yaw = angle;
             }
+
+            debug.warn("Saga.Panorama.load()", "yaw:" + yaw, "YAW SET");
 
             TweenLite.set(center, {
                 css: {
