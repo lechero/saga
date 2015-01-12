@@ -2824,7 +2824,7 @@ Saga.Panorama = function (containerDiv, opts) {
                     rotateYTo: u.getShortestRotation(yaw, deg)
                 },
                 rotatePanorama = function () {
-                    debug.warn("rotatePanorama", yaw, obj.rotateY);
+                    //debug.warn("rotatePanorama", yaw, obj.rotateY);
                     if (tween.paused()) {
                         return;
                     }
@@ -3063,7 +3063,7 @@ Saga.Panorama = function (containerDiv, opts) {
                 yaw = angle;
             }
 
-            debug.warn("Saga.Panorama.load()", "yaw:" + yaw, "YAW SET");
+            //debug.warn("Saga.Panorama.load()", "yaw:" + yaw, "YAW SET");
 
             TweenLite.set(center, {
                 css: {

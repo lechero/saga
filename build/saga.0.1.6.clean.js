@@ -2820,7 +2820,7 @@ Saga.Panorama = function (containerDiv, opts) {
                     rotateYTo: u.getShortestRotation(yaw, deg)
                 },
                 rotatePanorama = function () {
-                    
+                    //
                     if (tween.paused()) {
                         return;
                     }
@@ -3059,7 +3059,7 @@ Saga.Panorama = function (containerDiv, opts) {
                 yaw = angle;
             }
 
-            
+            //
 
             TweenLite.set(center, {
                 css: {
