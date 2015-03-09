@@ -98,12 +98,14 @@ Saga.StackLoader = function () {
 
         var file,
             ext;
-        //debug.log("Saga.StackLoader.loadItem() ->", stack[0]);
+       
         if (u.isFunction(stack[0])) { // callback
             stack[0]();
             loadItemDone();
+			//debug.log("Saga.StackLoader.loadItem() -> CALLBACKED", stack);
         } else {
             file = stack[0];
+			//debug.log("Saga.StackLoader.loadItem() ->", file);
             ext = u.fileExtension(file);
             if (ext === "js" || ext === "jst") {
                 loadJs(file, function (script) {

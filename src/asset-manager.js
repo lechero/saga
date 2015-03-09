@@ -170,9 +170,11 @@ Saga.AssetManager = (function () {
         initTemplates = function (tmpls, cb) {
             templates = tmpls;
             var urls = u.values(templates);
-
+		//	debug.error("Saga.AssetManager.initTemplates() -> ", templates);
             loadManager.load(urls, function () {
+				//debug.warn("Saga.AssetManager.initTemplates() -> LOADED: ");
                 u.each(templates, function (item, name) {
+					//debug.warn("Saga.AssetManager.initTemplates() -> TEMPLATE: ", name, item);
                     templates[name] = u.template(loadManager.dir()[item]);
                     //item.content = loadManager.dir()[item];
                 });
@@ -192,6 +194,7 @@ Saga.AssetManager = (function () {
 
     pub = {
         initTemplates: function (templates, cb) {
+			//debug.error("Saga.AssetManager.initTemplates() -> PUB!!!");
             initTemplates(templates, cb);
         },
         init: function (projectAssets) {

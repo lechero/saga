@@ -320,6 +320,8 @@ Saga.Dom = (function () {
                 }
                 xy.x = Math.round(xy.x / scaleFactor);
                 xy.y = Math.round(xy.y / scaleFactor);
+				
+				
                 debug.info("Scale Adjusting x,y position !!", scaleFactor);
             }
             return xy;
