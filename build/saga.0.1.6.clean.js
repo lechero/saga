@@ -982,6 +982,8 @@ Saga.Dom = (function () {
                 }
                 xy.x = Math.round(xy.x / scaleFactor);
                 xy.y = Math.round(xy.y / scaleFactor);
+				
+				
                 
             }
             return xy;
@@ -1836,12 +1838,14 @@ Saga.StackLoader = function () {
 
         var file,
             ext;
-        //
+       
         if (u.isFunction(stack[0])) { // callback
             stack[0]();
             loadItemDone();
+			//
         } else {
             file = stack[0];
+			//
             ext = u.fileExtension(file);
             if (ext === "js" || ext === "jst") {
                 loadJs(file, function (script) {
@@ -2073,9 +2077,11 @@ Saga.AssetManager = (function () {
         initTemplates = function (tmpls, cb) {
             templates = tmpls;
             var urls = u.values(templates);
-
+		//	debug.error("Saga.AssetManager.initTemplates() -> ", templates);
             loadManager.load(urls, function () {
+				//
                 u.each(templates, function (item, name) {
+					//
                     templates[name] = u.template(loadManager.dir()[item]);
                     //item.content = loadManager.dir()[item];
                 });
@@ -2095,6 +2101,7 @@ Saga.AssetManager = (function () {
 
     pub = {
         initTemplates: function (templates, cb) {
+			//debug.error("Saga.AssetManager.initTemplates() -> PUB!!!");
             initTemplates(templates, cb);
         },
         init: function (projectAssets) {
