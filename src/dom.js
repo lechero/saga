@@ -226,7 +226,7 @@ Saga.Dom = (function () {
                         addClass(fields[i], "error");
                         valid = false;
                     }
-                    if (mandatory[fields[i].name].no) {
+                    if (mandatory[fields[i].name] && mandatory[fields[i].name].no) {
                         invalidVar = u.find(mandatory[fields[i].name].no, isInvalidVar);
                         if (invalidVar) {
                             addClass(fields[i], "error");
