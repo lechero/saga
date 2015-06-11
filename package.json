@@ -1,6 +1,6 @@
 {
     "name": "SagaJS",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "title": "Saga - Js - Javascript Framework",
     "description": "Javascript Framework, Utils, preload assets/content, show hide assets, ajax loader, dom functions, routing and much more!",
     "author": "Lechero lechero@sagajs.com (https://github.com/lechero/)",
