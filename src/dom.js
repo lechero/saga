@@ -177,7 +177,7 @@ Saga.Dom = (function () {
             }
             return true;
         },
-        setInputData = function (formClass, data, container) {
+         setInputData = function (formClass, data, container) {
             debug.info("Saga.Dom.setInputData() -> ", formClass, container, data);
             var fields = getByClass(formClass),
                 fieldsTotal = fields.length,
@@ -185,19 +185,24 @@ Saga.Dom = (function () {
 
             for (i; i < fieldsTotal; i += 1) {
                 //console.log(fields[i].name+" / "+data[fields[i].name]);
-                if ((data[fields[i].name] || data[fields[i].name] === "") && fields[i].type !== "file") {
+                if ((data[fields[i].name] || data[fields[i].name] === "") && fields[i].type !== "file" && fields[i].type !== "radio") {
                     fields[i].value = data[fields[i].name];
                 }
             }
             //        }
         },
         getInputData = function (fieldClassName, findIn, man, incAll) { // check for all fields except file
-            var data = {},
+            var result,
+                data = {},
                 files = {},
                 fields = getByClass(fieldClassName, findIn),
                 gotFields = {},
                 fieldsTotal = fields.length,
                 i = 0,
+                missing = [],
+                radios = {},
+                radioValid = true,
+                fieldValid = true,
                 valid = true,
                 mandatory = false,
                 includeAll,
@@ -215,22 +220,23 @@ Saga.Dom = (function () {
                 mandatory = man;
             }
 
-
             for (i; i < fieldsTotal; i += 1) {
+                fieldValid = true;
                 if (fields[i].type !== "file" && fields[i].type !== "radio") {
-
-                    //debug.error("DOM INPUT",fields[i],fields[i].name);
-
                     removeClass(fields[i], "error");
                     if (mandatory[fields[i].name] && fields[i].value === "") {
                         addClass(fields[i], "error");
                         valid = false;
+                        fieldValid = false;
+                        missing.push(fields[i].name);
                     }
                     if (mandatory[fields[i].name] && mandatory[fields[i].name].no) {
                         invalidVar = u.find(mandatory[fields[i].name].no, isInvalidVar);
                         if (invalidVar) {
                             addClass(fields[i], "error");
                             valid = false;
+                            fieldValid = false;
+                            missing.push(fields[i].name);
                         }
                     }
                     if (includeAll || (!includeAll && fields[i].value !== "")) {
@@ -240,30 +246,67 @@ Saga.Dom = (function () {
                     }
                     //debug.error("DOM INPUT END ",fields[i],fields[i].name);
                 }
+
+                if(fields[i].type === "radio"){
+                    
+                    if(!radios.hasOwnProperty(fields[i].name)){
+                        radios[fields[i].name] = [];
+                    }
+                    radios[fields[i].name].push(fields[i]);
+                //    debug.error("RADIO: ",fields[i], radios);
+                }
+
+                /*
                 if (fields[i].type === "radio" && fields[i].checked) {
                     if (mandatory[fields[i].name] && fields[i].value === "") {
                         addClass(fields[i], "error");
                         valid = false;
+                        fieldValid = false;
+                        missing.push(fields[i]);
                     }
                     if (includeAll || (!includeAll && fields[i].value !== "")) {
                         data[fields[i].name] = fields[i].value;
                         gotFields[fields[i].name] = fields[i];
                     }
                 }
-
+                */
                 if (fields[i].value !== "" && fields[i].type === "file") {
                     //if(!includeAll && fields[i].value !== ""){
                     files[fields[i].name] = fields[i];
                     //}
                 }
 
+
+            //    debug.error("DOM INPUT",fields[i],fields[i].name, "valid:", fieldValid, valid);
             }
-            return {
+
+             u.each(radios, function(radioGroup, name){
+                    
+                    radioValid = false;
+                    u.each(radioGroup, function(radio){
+                        if(radio.checked){
+                            radioValid = true;
+                        }
+                    });
+
+                    if(!radioValid){
+                        valid = false;
+                        fieldValid = false;
+                        missing.push(name);
+                    }
+                });
+
+            result =  {
                 'valid': valid,
+                'missing': missing,
                 'data': data,
                 'fields': gotFields,
                 'files': files
             };
+
+            //debug.error("DOM INPUT",missing);
+
+            return result;
         },
         getElementStyle = function (element, styleProp) {
             return (element.currentStyle) ? element.currentStyle[styleProp] : (window.getComputedStyle) ? document.defaultView.getComputedStyle(element, null).getPropertyValue(styleProp) : 'unknown';

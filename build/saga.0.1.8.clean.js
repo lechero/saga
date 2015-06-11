@@ -73,7 +73,7 @@ Saga.Util = (function () {
                 dx = point1.x - point2.x,
                 theta = Math.atan2(dy, dx);
             theta *= 180 / Math.PI; // rads to degs
-            //debug.info("Saga.FloorMap.Animation.angleToPoint()", theta, point1, point2);
+            //
             return theta;
         },
         getShortestRotation = function (fromAngle, toAngle) {
@@ -424,7 +424,7 @@ Saga.net = (function () {
                 timeout,
                 abortHandler,
                 initOptions = function (options) {
-                    debug.info("Saga.net.Loader -> initOptions: ", options, data);
+                    
                     if (options) {
                         if (options.url) {
                             url = options.url;
@@ -469,11 +469,7 @@ Saga.net = (function () {
                             //ebug.warn("Saga.net.Loader -> Success, but couldn't parse JSON!", er);
                         }
                         /*
-                        debug.warn("Saga.net.Loader -> Success!", {
-                            'duration': duration,
-                            'state': xmlHttp.readyState,
-                            'response': response
-                        });
+                        
                         */
                         if (success) {
                             success.call(null, xmlHttp.responseText);
@@ -486,7 +482,7 @@ Saga.net = (function () {
                     }
                 }
                 /* else {
-                    debug.warn("Saga.net.Loader -> state(" + xmlHttp.readyState + "/" + xmlHttp.status + ")");
+                    
                 }*/
             };
 
@@ -499,7 +495,7 @@ Saga.net = (function () {
 
             execute = function (options) {
                 initOptions(options);
-                debug.info("Saga.net.Loader -> execute()", url, options, data);
+                
                 start = new Date().getTime();
                 xmlHttp.open(method, url, true);
                 if (String(method) === "post") {
@@ -698,7 +694,7 @@ Saga.Dom = (function () {
                     element.setAttributeNS(null, "class", classes);
                 }
             } catch (e) {
-                //debug.warn("Saga.Dom.addClassNs(\"" + element + "\"), Class: " + className + " ERROR", e);
+                //
             }
         },
         addClass = function (element, className) {
@@ -716,7 +712,7 @@ Saga.Dom = (function () {
                     element.setAttributeNS(null, "class", classes);
                 }
             } catch (e) {
-                //debug.warn("Saga.Dom.removeClassNs(\"" + element + "\"), Class: " + className + " ERROR", e);
+                //
             }
             return true;
         },
@@ -776,7 +772,7 @@ Saga.Dom = (function () {
             style.type = "text/css";
             if (id) {
                 if (elementExists(id)) {
-                    debug.warn("Saga.Dom.addCss(\"" + id + "\"), ID: " + id + " already exists");
+                    
                 }
                 style.id = id;
             }
@@ -790,7 +786,7 @@ Saga.Dom = (function () {
         },
         removeCss = function (id) {
             if (!elementExists(id)) {
-                debug.warn("Saga.Dom.removeCss(\"" + id + "\"), ID: " + id + " doesn't exist!");
+                
                 return false;
             }
             head.removeChild(getById(id));
@@ -843,32 +839,27 @@ Saga.Dom = (function () {
             }
             return true;
         },
-         setInputData = function (formClass, data, container) {
-            debug.info("Saga.Dom.setInputData() -> ", formClass, container, data);
+        setInputData = function (formClass, data, container) {
+            
             var fields = getByClass(formClass),
                 fieldsTotal = fields.length,
                 i = 0;
 
             for (i; i < fieldsTotal; i += 1) {
                 //console.log(fields[i].name+" / "+data[fields[i].name]);
-                if ((data[fields[i].name] || data[fields[i].name] === "") && fields[i].type !== "file" && fields[i].type !== "radio") {
+                if ((data[fields[i].name] || data[fields[i].name] === "") && fields[i].type !== "file") {
                     fields[i].value = data[fields[i].name];
                 }
             }
             //        }
         },
         getInputData = function (fieldClassName, findIn, man, incAll) { // check for all fields except file
-            var result,
-                data = {},
+            var data = {},
                 files = {},
                 fields = getByClass(fieldClassName, findIn),
                 gotFields = {},
                 fieldsTotal = fields.length,
                 i = 0,
-                missing = [],
-                radios = {},
-                radioValid = true,
-                fieldValid = true,
                 valid = true,
                 mandatory = false,
                 includeAll,
@@ -886,23 +877,22 @@ Saga.Dom = (function () {
                 mandatory = man;
             }
 
+
             for (i; i < fieldsTotal; i += 1) {
-                fieldValid = true;
                 if (fields[i].type !== "file" && fields[i].type !== "radio") {
+
+                    //debug.error("DOM INPUT",fields[i],fields[i].name);
+
                     removeClass(fields[i], "error");
                     if (mandatory[fields[i].name] && fields[i].value === "") {
                         addClass(fields[i], "error");
                         valid = false;
-                        fieldValid = false;
-                        missing.push(fields[i].name);
                     }
                     if (mandatory[fields[i].name] && mandatory[fields[i].name].no) {
                         invalidVar = u.find(mandatory[fields[i].name].no, isInvalidVar);
                         if (invalidVar) {
                             addClass(fields[i], "error");
                             valid = false;
-                            fieldValid = false;
-                            missing.push(fields[i].name);
                         }
                     }
                     if (includeAll || (!includeAll && fields[i].value !== "")) {
@@ -912,67 +902,30 @@ Saga.Dom = (function () {
                     }
                     //debug.error("DOM INPUT END ",fields[i],fields[i].name);
                 }
-
-                if(fields[i].type === "radio"){
-                    
-                    if(!radios.hasOwnProperty(fields[i].name)){
-                        radios[fields[i].name] = [];
-                    }
-                    radios[fields[i].name].push(fields[i]);
-                //    debug.error("RADIO: ",fields[i], radios);
-                }
-
-                /*
                 if (fields[i].type === "radio" && fields[i].checked) {
                     if (mandatory[fields[i].name] && fields[i].value === "") {
                         addClass(fields[i], "error");
                         valid = false;
-                        fieldValid = false;
-                        missing.push(fields[i]);
                     }
                     if (includeAll || (!includeAll && fields[i].value !== "")) {
                         data[fields[i].name] = fields[i].value;
                         gotFields[fields[i].name] = fields[i];
                     }
                 }
-                */
+
                 if (fields[i].value !== "" && fields[i].type === "file") {
                     //if(!includeAll && fields[i].value !== ""){
                     files[fields[i].name] = fields[i];
                     //}
                 }
 
-
-            //    debug.error("DOM INPUT",fields[i],fields[i].name, "valid:", fieldValid, valid);
             }
-
-             u.each(radios, function(radioGroup, name){
-                    
-                    radioValid = false;
-                    u.each(radioGroup, function(radio){
-                        if(radio.checked){
-                            radioValid = true;
-                        }
-                    });
-
-                    if(!radioValid){
-                        valid = false;
-                        fieldValid = false;
-                        missing.push(name);
-                    }
-                });
-
-            result =  {
+            return {
                 'valid': valid,
-                'missing': missing,
                 'data': data,
                 'fields': gotFields,
                 'files': files
             };
-
-            //debug.error("DOM INPUT",missing);
-
-            return result;
         },
         getElementStyle = function (element, styleProp) {
             return (element.currentStyle) ? element.currentStyle[styleProp] : (window.getComputedStyle) ? document.defaultView.getComputedStyle(element, null).getPropertyValue(styleProp) : 'unknown';
@@ -1005,7 +958,7 @@ Saga.Dom = (function () {
                         return part;
                     }
                     if (part === "") { // troubles, check for starting with - ?? mayb <- it fuckes le transform , grrr
-                        debug.warn("Something is starting with a -");
+                        
                     }
                     return part.charAt(0).toUpperCase() + part.slice(1);
                 });
@@ -1031,7 +984,7 @@ Saga.Dom = (function () {
                 xy.y = Math.round(xy.y / scaleFactor);
 				
 				
-                debug.info("Scale Adjusting x,y position !!", scaleFactor);
+                
             }
             return xy;
         },
@@ -1062,7 +1015,7 @@ Saga.Dom = (function () {
             if (el.addEventListener) {
                 el.addEventListener(eventName, eventHandler, false);
             } else if (el.attachEvent) {
-                debug.log("Saga.Dom.bindEvent() -> ", eventName, 'on' + eventName);
+                
                 el.attachEvent('on' + eventName, eventHandler);
             }
         },
@@ -1100,11 +1053,11 @@ Saga.Dom = (function () {
             if (obj4) {
                 u.extend(styles, obj4);
             }
-            //debug.info("Saga.Dom.setStyles() -> Applying: ", elem, styles);
+            //
             u.each(styles, function (value, style) {
                 // test
                 style = toCamelCase(style);
-                //debug.info("Saga.Dom.setStyles() -> Applying: ", style, ": ", value);
+                //
                 elem.style[style] = value;
             });
         };
@@ -1127,7 +1080,7 @@ Saga.Dom = (function () {
         */
         setOrigin: function (elem, point) {
             var transformOrigin = point.x + "px " + point.y + "px";
-            debug.warn("Saga.FloorMap.Floor.setOrigin()", elem, point, transformOrigin);
+            
             elem.style.WebkitTransformOrigin = transformOrigin;
             elem.style.MozTransformOrigin = transformOrigin;
             elem.style.OTransformOrigin = transformOrigin;
@@ -1295,7 +1248,7 @@ Saga.Animation = (function () {
                         return part;
                     }
                     if (part === "") { // troubles, check for starting with - ?? mayb <- it fuckes le transform , grrr
-                        debug.warn("Something is starting with a -");
+                        
                     }
                     return part.charAt(0).toUpperCase() + part.slice(1);
                 });
@@ -1408,22 +1361,22 @@ Saga.Animation = (function () {
             }
 
             styles = transformStyles(styles, elem);
-            debug.info("Saga.Dom.setStyles() -> Applying: ", elem, styles);
+            
             u.each(styles, function (value, style) {
 
                 elem.style[style] = value;
-                debug.info("Saga.Dom.setStyles() -> Applying: ", style, value);
+                
             });
         },
         animationCss3 = function () {
             var pub,
                 tEnd = transitionEnd(),
                 set = function (elem, props) {
-                    debug.warn("set", elem, props);
+                    
                     setStyles(elem, props);
                 },
                 to = function (elem, props, time, cb) {
-                    debug.warn("to", elem, props, time);
+                    
 
                     var transStyles = {},
                         tEndListener;
@@ -1544,7 +1497,7 @@ Saga.Holder = function (holderDivName) {
         d = Saga.Dom,
         place = function (newAsset) {
             asset = newAsset;
-            debug.info("Saga.Holder.place()", newAsset);
+            
             div = document.getElementById(divName);
             div.innerHTML = asset.Html();
 
@@ -1626,7 +1579,7 @@ Saga.Asset = function (assetName, assetInfo) {
             }
         },
         init = function (info) {
-            debug.info("Saga.Asset.init('" + name + "')", assetInfo);
+            
             if (!assetInfo.hasOwnProperty('files')) {
                 debug.error("Saga.Asset.init('" + name + "') -> No content found, exiting");
                 return;
@@ -1726,7 +1679,7 @@ Saga.Route = (function () {
             */
         },
         hashChange = function (newHash) {
-            debug.info("Saga.Route.hashChange('" + newHash + "'), from '" + hash + "'");
+            
 
             hashParts = getHashParts(newHash);
             if (baseHash !== hashParts[0]) {
@@ -1762,7 +1715,7 @@ Saga.Route = (function () {
             hashChange(hash);
         },
         showPage = function (page) {
-            debug.info("Saga.Route.showPage('" + page + "')");
+            
             window.location.hash = page;
         };
 
@@ -1869,14 +1822,14 @@ Saga.StackLoader = function () {
     };
 
     loadItem = function () {
-        //debug.info("Saga.StackLoader.loadItem() -> ", stack.length);
+        //
         if (loading) {
-            debug.info("Saga.StackLoader.loadItem() -> Already loading, waiting...");
+            
             return;
         }
 
         if (stack.length <= 0) {
-            debug.info("Saga.StackLoader.loadItem() -> Stack fully loaded!");
+            
             // event?@?!!?!
             return;
         }
@@ -1889,10 +1842,10 @@ Saga.StackLoader = function () {
         if (u.isFunction(stack[0])) { // callback
             stack[0]();
             loadItemDone();
-			//debug.log("Saga.StackLoader.loadItem() -> CALLBACKED", stack);
+			//
         } else {
             file = stack[0];
-			//debug.log("Saga.StackLoader.loadItem() ->", file);
+			//
             ext = u.fileExtension(file);
             if (ext === "js" || ext === "jst") {
                 loadJs(file, function (script) {
@@ -1919,7 +1872,7 @@ Saga.StackLoader = function () {
     };
 
     load = function (stuff, cb) { // collection of urls
-        //debug.info("Saga.StackLoader.load() -> stuff: " + stuff);
+        //
         if (u.isString(stuff)) {
             stack.push(stuff);
         } else {
@@ -1982,7 +1935,7 @@ Saga.AssetManager = (function () {
             }
         },
         loadAsset = function (asset, cb) {
-            debug.info("Saga.AssetManager.loadAsset() -> ", asset);
+            
             if (asset.loaded()) {
                 loadAssetDone(asset, cb);
                 return;
@@ -2010,7 +1963,7 @@ Saga.AssetManager = (function () {
             });
         },
         initAssets = function (assets) {
-            debug.info("Saga.AssetManager.initAssets() -> ", assets);
+            
             u.each(assets, function (assetInfo, name) {
                 u.extend(assetInfo, Saga.Asset(name, assetInfo));
                 assetInfo.Holder = getHolder(assetInfo.holder);
@@ -2018,7 +1971,7 @@ Saga.AssetManager = (function () {
             pub.fire("inited");
         },
         init = function (projectAssets, holders) {
-            debug.info("Saga.AssetManager.init() -> ", projectAssets);
+            
             if (holders) {
                 u.each(holders, function (holder, name) {
                     holders[holder] = getHolder(holder);
@@ -2029,38 +1982,38 @@ Saga.AssetManager = (function () {
             initAssets(assets);
         },
         remove = function (asset) {
-            debug.info("Saga.AssetManager.remove() -> ", asset);
+            
             try {
                 asset.View.remove();
                 pub.fire(asset.name + ":removed");
             } catch (err) {
                 pub.fire(asset.name + ":removed");
-                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
+                
             }
 
-            debug.info("Saga.AssetManager.remove() -> CLEARING HOLDER", asset);
+            
 
 
             try {
                 asset.Holder.remove();
                 //pub.fire(asset.name + ":removed");
-                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> REMOVED !!!!");
+                
             } catch (err) {
                 //pub.fire(asset.name + ":removed");
-                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
+                
             }
 
             try {
                 asset.Js().parentNode.removeChild(asset.Js());
-                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> JS REMOVED !!!!");
+                
             } catch (errr) {
                 //pub.fire(asset.name + ":removed");
-                debug.warn("Saga.AssetManager.remove('" + asset.name + "') -> No REMOVE");
+                
             }
 
         },
         hide = function (asset, cb) {
-            debug.info("Saga.AssetManager.hide() -> ", asset);
+            
             try {
                 asset.View.hide(function () {
                     pub.fire(asset.name + ":hidden");
@@ -2075,11 +2028,11 @@ Saga.AssetManager = (function () {
                 if (cb) {
                     cb();
                 }
-                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No HIDE");
+                
             }
         },
         place = function (asset) {
-            debug.info("Saga.AssetManager.place -> ", asset.name, "in", asset.holder, asset.Holder);
+            
             if (!asset.loaded()) {
                 loadAsset(asset, function () {
                     place(asset);
@@ -2092,11 +2045,11 @@ Saga.AssetManager = (function () {
 
             asset.Holder.place(asset);
             try {
-                //debug.warn("Saga.AssetManager.place('" + asset.name + "') -> INITING");
+                //
                 asset.View.init();
-                //debug.warn("Saga.AssetManager.place('" + asset.name + "') -> INIT");
+                //
             } catch (er) {
-                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No INIT", asset, er);
+                
             }
             pub.fire(asset.name + ":inited");
 
@@ -2106,14 +2059,14 @@ Saga.AssetManager = (function () {
                 });
             } catch (err) {
                 pub.fire(asset.name + ":shown");
-                debug.warn("Saga.AssetManager.place('" + asset.name + "') -> No SHOW");
+                
             }
         },
         show = function (asset) {
-            debug.info("Saga.AssetManager.show(" + asset.name + ") -> ", asset, asset.Holder, asset.Holder.asset());
+            
 
             if (asset.Holder && asset.Holder.asset()) {
-                debug.info("Saga.AssetManager.show -> hiding", asset.Holder.asset());
+                
                 hide(asset.Holder.asset(), function () {
                     place(asset);
                 });
@@ -2126,9 +2079,9 @@ Saga.AssetManager = (function () {
             var urls = u.values(templates);
 		//	debug.error("Saga.AssetManager.initTemplates() -> ", templates);
             loadManager.load(urls, function () {
-				//debug.warn("Saga.AssetManager.initTemplates() -> LOADED: ");
+				//
                 u.each(templates, function (item, name) {
-					//debug.warn("Saga.AssetManager.initTemplates() -> TEMPLATE: ", name, item);
+					//
                     templates[name] = u.template(loadManager.dir()[item]);
                     //item.content = loadManager.dir()[item];
                 });
@@ -2184,23 +2137,23 @@ Saga.FontManager = (function () {
             var fontConfig = fonts,
                 fontCallbacks = {
                     loading: function () {
-                        debug.info("Saga.FontManager.load() -> loading: ");
+                        
                     },
                     fontloading: function (fontFamily, fontDescription) {
-                        debug.info("Saga.FontManager.load() -> fontloading: ", fontFamily, fontDescription);
+                        
                     },
                     fontactive: function (fontFamily, fontDescription) {
-                        debug.info("Saga.FontManager.load() -> fontactive: ", fontFamily, fontDescription);
+                        
                     },
                     fontinactive: function (fontFamily, fontDescription) {
-                        debug.info("Saga.FontManager.load() -> fontinactive: ", fontFamily, fontDescription);
+                        
                     },
                     active: function () {
-                        debug.info("Saga.FontManager.load() -> active: ");
+                        
                         pub.fire("loaded");
                     },
                     inactive: function () {
-                        debug.info("Saga.FontManager.load() -> inactive: ");
+                        
                     },
                     timeout: 1500
                 };
@@ -2291,37 +2244,37 @@ Saga.Keyboard = (function () {
         usefulKeyCodes = u.invert(usefulKeys),
         downKeys = {},
         keyDown = function (evt) {
-            debug.info("Saga.Keyboard.keyDown() -> ", evt);
+            
             downKeys[evt.keyCode] = true;
             pub.fire("key:down", evt);
             if (usefulKeys.hasOwnProperty(evt.keyCode)) {
                 pub.fire(usefulKeys[evt.keyCode], evt);
-                debug.warn("Saga.Keyboard.keyDown() -> usefulKey: ", usefulKeys[evt.keyCode]);
+                
                 if (downKeys[usefulKeyCodes.shift]) {
                     pub.fire("shift:" + usefulKeys[evt.keyCode], evt);
-                    debug.warn("Saga.Keyboard.keyDown() -> SHIFT + usefulKey: ", usefulKeys[evt.keyCode]);
+                    
                 }
             }
         },
         keyPress = function (evt) {
-            debug.info("Saga.Keyboard.keyPress() -> ", evt);
+            
             pub.fire("key:press", evt);
         },
         keyUp = function (evt) {
-            debug.info("Saga.Keyboard.keyUp() -> ", evt);
+            
             if (downKeys.hasOwnProperty(evt.keyCode)) {
                 delete downKeys[evt.keyCode];
             }
             pub.fire("key:up", evt);
         },
         init = function () {
-            debug.info("Saga.Keyboard.init()");
+            
             window.onkeydown = keyDown;
             window.onkeypress = keyPress;
             window.onkeyup = keyUp;
         },
         deinit = function () {
-            debug.info("Saga.Keyboard.deinit()");
+            
             window.onkeydown = null;
             window.onkeypress = null;
             window.onkeyup = null;
@@ -2645,7 +2598,7 @@ Saga.Panorama = function (containerDiv, opts) {
 
 			depth = offsetX;
 
-			////debug.log("Saga.Panorama.update()", yaw, pitch);
+			////
 
 			if (pitch > maxTop) {
 				pitch = maxTop;
@@ -2680,7 +2633,7 @@ Saga.Panorama = function (containerDiv, opts) {
 
 			//center.style.opacity = obj.opacity;
 
-			////debug.warn("zoomUpdate", containerDiv.id, obj, yaw);
+			////
 
 
 		},
@@ -2874,7 +2827,7 @@ Saga.Panorama = function (containerDiv, opts) {
 					rotateYTo: u.getShortestRotation(yaw, deg)
 				},
 				rotatePanorama = function () {
-					//debug.warn("rotatePanorama", yaw, obj.rotateY);
+					//
 					if (tween.paused()) {
 						return;
 					}
@@ -2894,7 +2847,7 @@ Saga.Panorama = function (containerDiv, opts) {
 
 					rect = cube.getClientRects()[0];
 
-					////debug.log("Saga.Panorama.update()", cube, rect);
+					////
 
 					//////debug.error("PANORAMA ", container.id, ie, rect, size, distance, distanceFactor);
 
@@ -2903,7 +2856,7 @@ Saga.Panorama = function (containerDiv, opts) {
 
 					depth = offsetX;
 
-					////debug.log("Saga.Panorama.update()", yaw, pitch);
+					////
 
 					if (pitch > maxTop) {
 						pitch = maxTop;
@@ -2930,7 +2883,7 @@ Saga.Panorama = function (containerDiv, opts) {
 		},
 
 		buildFaceIe = function (face, url, cb) {
-			////debug.info("Saga.Panorama.buildFaceIe()", face, url);
+			////
 			var element = document.createElement("div"),
 				halfsize,
 				transform,
@@ -3013,7 +2966,7 @@ Saga.Panorama = function (containerDiv, opts) {
 			faces[face] = element;
 		},
 		buildFace = function (face, url, cb) {
-			////debug.info("Saga.Panorama.buildFace()", face, url);
+			////
 			var element = document.createElement("div"),
 				halfsize,
 				transform,
@@ -3113,7 +3066,7 @@ Saga.Panorama = function (containerDiv, opts) {
 				yaw = angle;
 			}
 
-			//debug.warn("Saga.Panorama.load()", "yaw:" + yaw, "YAW SET");
+			//
 
 			TweenLite.set(center, {
 				css: {
@@ -3345,12 +3298,12 @@ Saga.Panorama = function (containerDiv, opts) {
 			angleOffset: angleOffset
 		});
 
-		////debug.log("UPDATE: "+offsetX+","+offsetY+" -> "+pitch+","+yaw+":"+transform);
+		////
 	};
 	options = u.extend(options, opts);
 
 	onUp = function (evt) {
-		////debug.log("Saga.Panorama.onUp()", pub.info());
+		////
 		cube.removeEventListener("mousemove", onMove);
 		cube.removeEventListener("mouseup", onUp);
 		cube.removeEventListener("touchmove", onMove);
@@ -3361,13 +3314,13 @@ Saga.Panorama = function (containerDiv, opts) {
 		return false;
 	};
 	onDown = function (evt) {
-		debug.log("Saga.Panorama.onDown()", evt.type);
+		
 		if (evt.type === "touchstart") {
-			debug.log("Saga.Panorama.onDown()", "TOUCH");
+			
 			cube.addEventListener("touchmove", onMove);
 			cube.addEventListener("touchend", onUp);
 		} else {
-			debug.log("Saga.Panorama.onDown()", "CLICK");
+			
 			cube.addEventListener("mousemove", onMove);
 			cube.addEventListener("mouseup", onUp);
 		}
@@ -3407,7 +3360,7 @@ Saga.Panorama = function (containerDiv, opts) {
 		yaw -= deltax * speed;
 		pitch += deltay * speed;
 
-		debug.log("move x,y: " + x + "," + y + " : " + deltax + "," + deltay + " : " + yaw + "," + pitch);
+		
 		////////debug.error("Saga.Panorama.onMove() -> updating");
 		update();
 
@@ -3418,7 +3371,7 @@ Saga.Panorama = function (containerDiv, opts) {
 		return false;
 	};
 
-	//debug.log("Panorama - SAGA", container);
+	//
 	pub = {
 		pause: function (time) {
 			return pause(time);
@@ -3606,7 +3559,7 @@ Saga.Slider = function (id, onDrag, percentage) {
             document.removeEventListener("touchend", touchUp);
         };
 
-    debug.log("Saga.Slider(" + id + ")");
+    
 
 
     dragger.style.width = draggerWidth + 'px';
@@ -3644,8 +3597,8 @@ Saga.Slider = function (id, onDrag, percentage) {
         rangeLeft = this.offsetLeft;
         down = true;
         /*
-        debug.log("OFFSET", rangeWidth, rangeLeft);
-        debug.log("POSt", e.pageX, e.layerX);
+        
+        
         */
         updateDraggerTouch(e);
         return false;
@@ -3668,8 +3621,8 @@ Saga.Slider = function (id, onDrag, percentage) {
         rangeLeft = this.offsetLeft;
         down = true;
         /*
-        debug.log("OFFSET", rangeWidth, rangeLeft);
-        debug.log("POSt", e.pageX, e.layerX);
+        
+        
         */
         updateDragger(e);
         return false;
