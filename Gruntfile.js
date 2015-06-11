@@ -55,6 +55,14 @@ module.exports = function (grunt) {
             main: {
                 files: [
                     {
+                        src: ['build/saga.<%= pkg.version %>.js'],
+                        dest: 'build/saga.js'
+                    }
+                ]
+            },
+			mini: {
+                files: [
+                    {
                         src: ['build/saga.<%= pkg.version %>.min.js'],
                         dest: 'build/saga.min.js'
                     }
@@ -100,6 +108,6 @@ module.exports = function (grunt) {
 
     // Default task(s).
     //grunt.registerTask('default', ['uglify']);
-    grunt.registerTask('default', ['concat', 'removelogging', 'uglify', 'copy']);
+    grunt.registerTask('default', ['concat', 'removelogging', 'uglify', 'copy:main','copy:mini']);
 
 };
