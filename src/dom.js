@@ -247,7 +247,7 @@ Saga.Dom = (function () {
                     //debug.error("DOM INPUT END ",fields[i],fields[i].name);
                 }
 
-                if(fields[i].type === "radio"){
+                if(fields[i].type === "radio" && mandatory[fields[i].name]){
                     
                     if(!radios.hasOwnProperty(fields[i].name)){
                         radios[fields[i].name] = [];
@@ -290,6 +290,9 @@ Saga.Dom = (function () {
                     });
 
                     if(!radioValid){
+						u.each(radioGroup, function(radio){
+							addClass(radio, "error");
+						});
                         valid = false;
                         fieldValid = false;
                         missing.push(name);
