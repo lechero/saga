@@ -789,11 +789,11 @@ Saga.Panorama = function (containerDiv, opts) {
 	onDown = function (evt) {
 		debug.log("Saga.Panorama.onDown()", evt.type);
 		if (evt.type === "touchstart") {
-			debug.log("Saga.Panorama.onDown()", "TOUCH");
+			//debug.log("Saga.Panorama.onDown()", "TOUCH");
 			cube.addEventListener("touchmove", onMove);
 			cube.addEventListener("touchend", onUp);
 		} else {
-			debug.log("Saga.Panorama.onDown()", "CLICK");
+			//debug.log("Saga.Panorama.onDown()", "CLICK");
 			cube.addEventListener("mousemove", onMove);
 			cube.addEventListener("mouseup", onUp);
 		}

@@ -3268,11 +3268,11 @@ Saga.Panorama = function (containerDiv, opts) {
 	onDown = function (evt) {
 		
 		if (evt.type === "touchstart") {
-			
+			//
 			cube.addEventListener("touchmove", onMove);
 			cube.addEventListener("touchend", onUp);
 		} else {
-			
+			//
 			cube.addEventListener("mousemove", onMove);
 			cube.addEventListener("mouseup", onUp);
 		}
