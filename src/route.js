@@ -30,7 +30,7 @@ Saga.Route = (function () {
                 if (routes.hasOwnProperty(baseHash)) {
                     routes[baseHash]();
                 } else {
-                    routes['default']();
+                    routes['default'](baseHash);
                 }
                 pub.fire("base:changed");
             } else {

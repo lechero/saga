@@ -1737,7 +1737,7 @@ Saga.Route = (function () {
                 if (routes.hasOwnProperty(baseHash)) {
                     routes[baseHash]();
                 } else {
-                    routes['default']();
+                    routes['default'](baseHash);
                 }
                 pub.fire("base:changed");
             } else {
@@ -1940,7 +1940,12 @@ Saga.StackLoader = function () {
         },
         dir: function () {
             return loaded;
-        }
+        },
+		get: function(k){
+			if(loaded.hasOwnProperty(k)){
+				return loaded[k];
+			}
+		}
     };
     u.extend(pub, Saga.Event());
     return pub;

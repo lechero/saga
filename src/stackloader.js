@@ -150,7 +150,12 @@ Saga.StackLoader = function () {
         },
         dir: function () {
             return loaded;
-        }
+        },
+		get: function(k){
+			if(loaded.hasOwnProperty(k)){
+				return loaded[k];
+			}
+		}
     };
     u.extend(pub, Saga.Event());
     return pub;
