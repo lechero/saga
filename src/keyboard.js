@@ -61,11 +61,12 @@ Saga.Keyboard = (function () {
 			downKeys[evt.keyCode] = true;
 			pub.fire("key:down", evt);
 			if (usefulKeys.hasOwnProperty(evt.keyCode)) {
-				pub.fire(usefulKeys[evt.keyCode], evt);
-				debug.warn("Saga.Keyboard.keyDown() -> usefulKey: ", usefulKeys[evt.keyCode]);
 				if (downKeys[usefulKeyCodes.shift]) {
 					pub.fire("shift:" + usefulKeys[evt.keyCode], evt);
 					debug.warn("Saga.Keyboard.keyDown() -> SHIFT + usefulKey: ", usefulKeys[evt.keyCode]);
+				} else {
+					debug.warn("Saga.Keyboard.keyDown() -> usefulKey: ", usefulKeys[evt.keyCode]);
+					pub.fire(usefulKeys[evt.keyCode], evt);
 				}
 			}
 		},

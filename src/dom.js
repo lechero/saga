@@ -444,9 +444,67 @@ Saga.Dom = (function () {
 				//debug.info("Saga.Dom.setStyles() -> Applying: ", style, ": ", value);
 				elem.style[style] = value;
 			});
+		},
+		isTouchSupported = function () {
+			if ("ontouchstart" in document.documentElement) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+		appendChildren = function (container, nodes, before) {
+			var i = 0,
+				l = nodes.length;
+
+			if (before) {
+				i = nodes.length - 1;
+				l = 0;
+				for (i; i >= l; i -= 1) {
+					container.insertBefore(nodes[i], before);
+				}
+				return;
+			}
+
+			for (i; i < l; i += 1) {
+				container.appendChild(nodes[i]);
+			}
+		},
+		getNodes = function (string) {
+			var preloadDiv = document.createElement('div');
+			preloadDiv.innerHTML = string;
+			return Array.prototype.slice.call(preloadDiv.children);
+		},
+		getNode = function (string) {
+			//var preloadDiv = document.createElement('div'),
+			var node = getNodes(string)[0] || false;
+			if (!node) {
+				node = document.createElement('div');
+				node.innerHTML = string;
+			}
+			return node;
+		},
+		addClick = function (elem, cb) {
+
+			if (isTouchSupported()) {
+				elem.addEventListener("touchstart", cb);
+			} else {
+				elem.addEventListener("mousedown", cb);
+			}
 		};
 
 	pub = {
+		appendChildren: function (container, nodes, before) {
+			appendChildren(container, nodes, before);
+		},
+		getNodes: function (string) {
+			return getNodes(string);
+		},
+		getNode: function (string) {
+			return getNode(string);
+		},
+		addClick: function (elem, cb) {
+			addClick(elem, cb);
+		},
 		mouseCoords: function (evt) {
 			return mouseCoords(evt);
 		},

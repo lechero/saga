@@ -38,200 +38,223 @@ var Saga = (function () {
 /*global Saga, console, _ */
 
 Saga.Util = (function () {
-    "use strict";
-    var pub = _,
-        objectSize = function (obj) {
-            var size = 0,
-                key;
-            for (key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    size += 1;
-                }
-            }
-            return size;
-        },
-        fileExtension = function (str) {
-            //var re = /(?:\.([^.]+))?$/;
-            return str.substr(str.lastIndexOf('.') + 1);
-            //return re.exec(str);
-        },
-        xElem = function (x, obj) {
-            var i = 0,
-                n;
-            for (n in obj) {
-                if (obj.hasOwnProperty(n)) {
-                    if (i === x) {
-                        return obj[n];
-                    }
-                    i += 1;
-                }
-            }
-            return false;
-        },
-        angleToPoint = function (point1, point2) {
-            var dy = point1.y - point2.y,
-                dx = point1.x - point2.x,
-                theta = Math.atan2(dy, dx);
-            theta *= 180 / Math.PI; // rads to degs
-            //debug.info("Saga.FloorMap.Animation.angleToPoint()", theta, point1, point2);
-            return theta;
-        },
-        getShortestRotation = function (fromAngle, toAngle) {
-            var oppositeAngle = 0,
-                diff1 = 0, // difference current angle to new angle
-                diff2 = 0; // difference current angle to opposite angle
+	"use strict";
+	var pub = _,
+		objectSize = function (obj) {
+			var size = 0,
+				key;
+			for (key in obj) {
+				if (obj.hasOwnProperty(key)) {
+					size += 1;
+				}
+			}
+			return size;
+		},
+		fileExtension = function (str) {
+			//var re = /(?:\.([^.]+))?$/;
+			return str.substr(str.lastIndexOf('.') + 1);
+			//return re.exec(str);
+		},
+		xElem = function (x, obj) {
+			var i = 0,
+				n;
+			for (n in obj) {
+				if (obj.hasOwnProperty(n)) {
+					if (i === x) {
+						return obj[n];
+					}
+					i += 1;
+				}
+			}
+			return false;
+		},
+		angleToPoint = function (point1, point2) {
+			var dy = point1.y - point2.y,
+				dx = point1.x - point2.x,
+				theta = Math.atan2(dy, dx);
+			theta *= 180 / Math.PI; // rads to degs
+			//debug.info("Saga.FloorMap.Animation.angleToPoint()", theta, point1, point2);
+			return theta;
+		},
+		getShortestRotation = function (fromAngle, toAngle) {
+			var oppositeAngle = 0,
+				diff1 = 0, // difference current angle to new angle
+				diff2 = 0; // difference current angle to opposite angle
 
-            if (toAngle > fromAngle) {
-                oppositeAngle = toAngle - 360;
-            } else {
-                oppositeAngle = toAngle + 360;
-            }
+			if (toAngle > fromAngle) {
+				oppositeAngle = toAngle - 360;
+			} else {
+				oppositeAngle = toAngle + 360;
+			}
 
-            diff1 = Math.abs(toAngle - fromAngle);
-            diff2 = Math.abs(oppositeAngle - fromAngle);
-            if (diff2 < diff1) {
-                toAngle = oppositeAngle;
-            }
+			diff1 = Math.abs(toAngle - fromAngle);
+			diff2 = Math.abs(oppositeAngle - fromAngle);
+			if (diff2 < diff1) {
+				toAngle = oppositeAngle;
+			}
 
-            return toAngle;
-        },
-        syntaxHighlight = function (json) {
-            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                var cls = 'number';
-                if (/^"/.test(match)) {
-                    if (/:$/.test(match)) {
-                        cls = 'key';
-                    } else {
-                        cls = 'string';
-                    }
-                } else if (/true|false/.test(match)) {
-                    cls = 'boolean';
-                } else if (/null/.test(match)) {
-                    cls = 'null';
-                }
-                return '<span class="' + cls + '">' + match + '</span>';
-            });
-        },
-        getHigher = function (col, prefix) {
-            var arr = [];
-            if (!prefix) {
-                prefix = "";
-            }
-            if (pub.isEmpty(col)) {
-                return prefix + "0";
-            }
-            pub.each(col, function (el) {
-                arr.push(parseInt(el.id.replace(prefix, ""), 10));
-            });
-            if (arr.length <= 0) {
-                return prefix + "0";
-            }
-            if (prefix + String(Math.max.apply(null, arr) + 1) === prefix + "NaN") {
-                return prefix + "0";
-            }
+			return toAngle;
+		},
+		syntaxHighlight = function (json) {
+			json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+			return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+				var cls = 'number';
+				if (/^"/.test(match)) {
+					if (/:$/.test(match)) {
+						cls = 'key';
+					} else {
+						cls = 'string';
+					}
+				} else if (/true|false/.test(match)) {
+					cls = 'boolean';
+				} else if (/null/.test(match)) {
+					cls = 'null';
+				}
+				return '<span class="' + cls + '">' + match + '</span>';
+			});
+		},
+		call = function (cb) {
+			if (cb && typeof (cb) === "function") {
+				var arg = Array.prototype.slice.call(arguments, 1);
+				try {
+					cb.apply(cb, arg);
+				} catch (e) {
 
-            return prefix + String(Math.max.apply(null, arr) + 1);
-        };
-    pub.fileExtension = function (str) {
-        return fileExtension(str);
-    };
+				}
+				//cb(arguments);
+			}
+		},
+		getHigher = function (col, prefix) {
+			var arr = [];
+			if (!prefix) {
+				prefix = "";
+			}
+			if (pub.isEmpty(col)) {
+				return prefix + "0";
+			}
+			pub.each(col, function (el) {
+				arr.push(parseInt(el.id.replace(prefix, ""), 10));
+			});
+			if (arr.length <= 0) {
+				return prefix + "0";
+			}
+			if (prefix + String(Math.max.apply(null, arr) + 1) === prefix + "NaN") {
+				return prefix + "0";
+			}
 
-    pub.xElem = function (x, obj) {
-        return xElem(x, obj);
-    }
+			return prefix + String(Math.max.apply(null, arr) + 1);
+		};
 
-    pub.syntaxHighlight = function (json) {
-        return syntaxHighlight(json);
-    };
+	pub.call = function () {
+		//var arg = Array.prototype.slice.call(arguments, 0);
+		call.apply(this, arguments);
+	}
+	pub.fileExtension = function (str) {
+		return fileExtension(str);
+	};
 
-    pub.objectSize = function (obj) {
-        return objectSize(obj);
-    };
+	pub.xElem = function (x, obj) {
+		return xElem(x, obj);
+	}
 
-    pub.angleToPoint = function (point1, point2) {
-        return angleToPoint(point1, point2);
-    };
+	pub.syntaxHighlight = function (json) {
+		return syntaxHighlight(json);
+	};
 
-    pub.getShortestRotation = function (fromAngle, toAngle) {
-        return getShortestRotation(fromAngle, toAngle);
-    };
+	pub.objectSize = function (obj) {
+		return objectSize(obj);
+	};
 
-    pub.getHigher = function (col, prefix) {
-        return getHigher(col, prefix);
-    };
+	pub.angleToPoint = function (point1, point2) {
+		return angleToPoint(point1, point2);
+	};
 
-    return pub;
+	pub.getShortestRotation = function (fromAngle, toAngle) {
+		return getShortestRotation(fromAngle, toAngle);
+	};
+
+	pub.getHigher = function (col, prefix) {
+		return getHigher(col, prefix);
+	};
+
+	return pub;
 }());
 /*jslint browser:true*/
 /*global Saga, console */
 
 Saga.Debug = (function () {
-    "use strict";
-    var pub,
-        util = Saga.Util,
-        outputDiv = false,
-        levels = ["log", "info", "error", "warn", "trace"],
-        activeLevels = ["log", "info", "warn", "error"],
-        timestamp = function () {
-            var d = new Date();
-            return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
-        },
-        output = function (type) {
-            //return;
-            if (util.contains(activeLevels, type)) {
-                var arg = Array.prototype.slice.call(arguments, 1);
-                arg.unshift(timestamp() + ": ");
-                try {
-                    console[type].apply(console, arg);
-                } catch (err) {
-                    console[type](arg.join(", "));
-                }
-                if (outputDiv) {
-                    outputDiv.innerHTML = outputDiv.innerHTML + '<br>' + JSON.stringify(arg); // JSON.stringify(arg) + "<br>" + outputDiv.innerHTML;
-                }
-            } else {
-                console.log("No contains");
-            }
-        },
-        trace = function () {
-            var arg = Array.prototype.slice.call(arguments, 0);
-            arg.unshift('trace');
-            output.apply(this, arg);
-        },
-        log = function () {
-            var arg = Array.prototype.slice.call(arguments, 0);
-            arg.unshift('log');
-            output.apply(this, arg);
-        },
-        info = function () {
-            var arg = Array.prototype.slice.call(arguments, 0);
-            arg.unshift('info');
-            output.apply(this, arg);
-        },
-        error = function () {
-            var arg = Array.prototype.slice.call(arguments, 0);
-            arg.unshift('error');
-            output.apply(this, arg);
-        },
-        warn = function () {
-            var arg = Array.prototype.slice.call(arguments, 0);
-            arg.unshift('warn');
-            output.apply(this, arg);
-        };
+	"use strict";
+	var pub,
+		util = Saga.Util,
+		outputDiv = false,
+		levels = ["log", "info", "error", "warn", "trace"],
+		activeLevels = ["log", "info", "warn", "error"],
+		timestamp = function () {
+			var d = new Date();
+			return (d.getUTCHours() + ':' + ('0' + d.getUTCMinutes()).slice(-2) + ':' + ('0' + d.getUTCSeconds()).slice(-2) + '.' + ('00' + d.getUTCMilliseconds()).slice(-3));
+		},
+		output = function (type) {
+			//return;
+			if (util.contains(activeLevels, type)) {
+				var arg = Array.prototype.slice.call(arguments, 1);
+				arg.unshift(timestamp() + ": ");
+				try {
+					console[type].apply(console, arg);
+				} catch (err) {
+					console[type](arg.join(", "));
+				}
+				if (outputDiv) {
+					outputDiv.innerHTML = outputDiv.innerHTML + '<br>' + JSON.stringify(arg); // JSON.stringify(arg) + "<br>" + outputDiv.innerHTML;
+				}
+			} else {
+				console.log("No contains");
+			}
+		},
+		trace = function () {
+			var arg = Array.prototype.slice.call(arguments, 0);
+			arg.unshift('trace');
+			output.apply(this, arg);
+		},
+		log = function () {
+			var arg = Array.prototype.slice.call(arguments, 0);
+			arg.unshift('log');
+			output.apply(this, arg);
+		},
+		info = function () {
+			var arg = Array.prototype.slice.call(arguments, 0);
+			arg.unshift('info');
+			output.apply(this, arg);
+		},
+		error = function () {
+			var arg = Array.prototype.slice.call(arguments, 0);
+			arg.unshift('error');
+			output.apply(this, arg);
+		},
+		warn = function () {
+			var arg = Array.prototype.slice.call(arguments, 0);
+			arg.unshift('warn');
+			output.apply(this, arg);
+		},
+		initNoDebug = function (level) {
+			Saga.NoDebug[level] = function () {};
+		};
 
-    if (Function.prototype.bind && window.console && typeof console.log === "object") {
-        //http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
-        console.log("debug reset console");
-        levels.forEach(function (method) {
-            console[method] = this.bind(console[method], console);
-        }, Function.prototype.call);
-    }
-
-    //console.log("debug")
+	if (Function.prototype.bind && window.console && typeof console.log === "object") {
+		//http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
+		console.log("debug reset console");
+		levels.forEach(function (method) {
+			console[method] = this.bind(console[method], console);
+		}, Function.prototype.call);
+	}
 
 
-    /*
+	Saga.NoDebug = {};
+	util.each(levels, initNoDebug);
+
+	//console.log("debug")
+
+
+	/*
     if (Function.prototype.bind && window.console && typeof console.log == "object") {
         util.each(levels,function(method){
             console[method] = this.bind(console[method], console);
@@ -248,34 +271,34 @@ Saga.Debug = (function () {
     }
 
     */
-    pub = {
-        log: function () {
-            log.apply(this, arguments);
-        },
-        info: function () {
-            info.apply(this, arguments);
-        },
-        error: function () {
-            error.apply(this, arguments);
-        },
-        warn: function () {
-            warn.apply(this, arguments);
-        },
-        levels: function (newLevels) {
-            if (newLevels) {
-                activeLevels = newLevels;
-            } else {
-                return activeLevels;
-            }
-        },
-        div: function (val) {
-            if (arguments.length > 0) {
-                outputDiv = val;
-            }
-            return outputDiv;
-        }
-    };
-    return pub;
+	pub = {
+		log: function () {
+			log.apply(this, arguments);
+		},
+		info: function () {
+			info.apply(this, arguments);
+		},
+		error: function () {
+			error.apply(this, arguments);
+		},
+		warn: function () {
+			warn.apply(this, arguments);
+		},
+		levels: function (newLevels) {
+			if (newLevels) {
+				activeLevels = newLevels;
+			} else {
+				return activeLevels;
+			}
+		},
+		div: function (val) {
+			if (arguments.length > 0) {
+				outputDiv = val;
+			}
+			return outputDiv;
+		}
+	};
+	return pub;
 }());
 /*jslint browser:true*/
 /*global Saga*/
@@ -1110,9 +1133,67 @@ Saga.Dom = (function () {
 				//debug.info("Saga.Dom.setStyles() -> Applying: ", style, ": ", value);
 				elem.style[style] = value;
 			});
+		},
+		isTouchSupported = function () {
+			if ("ontouchstart" in document.documentElement) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+		appendChildren = function (container, nodes, before) {
+			var i = 0,
+				l = nodes.length;
+
+			if (before) {
+				i = nodes.length - 1;
+				l = 0;
+				for (i; i >= l; i -= 1) {
+					container.insertBefore(nodes[i], before);
+				}
+				return;
+			}
+
+			for (i; i < l; i += 1) {
+				container.appendChild(nodes[i]);
+			}
+		},
+		getNodes = function (string) {
+			var preloadDiv = document.createElement('div');
+			preloadDiv.innerHTML = string;
+			return Array.prototype.slice.call(preloadDiv.children);
+		},
+		getNode = function (string) {
+			//var preloadDiv = document.createElement('div'),
+			var node = getNodes(string)[0] || false;
+			if (!node) {
+				node = document.createElement('div');
+				node.innerHTML = string;
+			}
+			return node;
+		},
+		addClick = function (elem, cb) {
+
+			if (isTouchSupported()) {
+				elem.addEventListener("touchstart", cb);
+			} else {
+				elem.addEventListener("mousedown", cb);
+			}
 		};
 
 	pub = {
+		appendChildren: function (container, nodes, before) {
+			appendChildren(container, nodes, before);
+		},
+		getNodes: function (string) {
+			return getNodes(string);
+		},
+		getNode: function (string) {
+			return getNode(string);
+		},
+		addClick: function (elem, cb) {
+			addClick(elem, cb);
+		},
 		mouseCoords: function (evt) {
 			return mouseCoords(evt);
 		},
@@ -1795,163 +1876,168 @@ Saga.Route = (function () {
 /*global Saga */
 
 Saga.StackLoader = function () {
-    "use strict";
-    var pub,
-        debug = Saga.Debug,
-        dom = Saga.Dom,
-        u = Saga.Util,
-        loader = Saga.net.Loader(),
-        loading = false,
-        loaded = {},
-        stack = [],
-        load,
-        loadItem,
-        loadItemDone,
-        loadCss = function (file, cb) {
-            var node = document.createElement("link");
-            node.onload = function () {
-                if (cb) {
-                    cb(node);
-                }
-            };
-            node.setAttribute("rel", "stylesheet");
-            node.setAttribute("type", "text/css");
-            node.setAttribute("href", file);
-        },
-        loadImage = function (file, cb) {
-            var img = document.createElement('img');
-            img.onload = function () {
-                if (cb) {
-                    cb(img);
-                }
-            };
-            img.src = file;
-        },
-        loadJs = function (file, cb) {
-            var script = document.createElement('script'),
-                done = false,
-                head = dom.head();
-            script.type = "text/javascript";
-            script.onload = script.onreadystatechange = function () {
-                if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
-                    done = true;
-                    script.onload = script.onreadystatechange = null;
-                    /*
+	"use strict";
+	var pub,
+		debug = Saga.Debug,
+		dom = Saga.Dom,
+		u = Saga.Util,
+		loader = Saga.net.Loader(),
+		loading = false,
+		loaded = {},
+		stack = [],
+		load,
+		loadItem,
+		loadItemDone,
+		loadCss = function (file, cb) {
+			var node = document.createElement("link");
+			node.onload = function () {
+				if (cb) {
+					cb(node);
+				}
+			};
+			node.setAttribute("rel", "stylesheet");
+			node.setAttribute("type", "text/css");
+			node.setAttribute("href", file);
+		},
+		loadImage = function (file, cb) {
+			var img = document.createElement('img');
+			img.onload = function () {
+				if (cb) {
+					cb(img);
+				}
+			};
+			img.src = file;
+		},
+		loadJs = function (file, cb) {
+			var script = document.createElement('script'),
+				done = false,
+				head = dom.head();
+			script.type = "text/javascript";
+			script.onload = script.onreadystatechange = function () {
+				if (!done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete")) {
+					done = true;
+					script.onload = script.onreadystatechange = null;
+					/*
                     if (head && script.parentNode) {
                         head.removeChild(script);
                     }
                     */
-                    if (cb) {
-                        cb(script);
-                    }
-                }
-            };
-            script.src = file;
-            head.appendChild(script);
-            return script;
-        },
-        loadHtml = function (file, cb) {
-            var loadOptions = {
-                method: "get",
-                url: file,
-                success: function (result) {
-                    if (cb) {
-                        cb(result);
-                    }
-                }
-            };
-            loader.execute(loadOptions);
-        };
+					if (cb) {
+						cb(script);
+					}
+				}
+			};
+			script.src = file;
+			head.appendChild(script);
+			return script;
+		},
+		loadHtml = function (file, cb) {
+			var loadOptions = {
+				method: "get",
+				url: file,
+				success: function (result) {
+					if (cb) {
+						cb(result);
+					}
+				}
+			};
+			loader.execute(loadOptions);
+		};
 
-    loadItemDone = function () {
-        var item = stack[0];
-        stack.shift();
-        loading = false;
-        loadItem();
-        pub.fire("loaded", {
-            url: item,
-            length: stack.length
-        });
-    };
+	loadItemDone = function () {
+		var item = stack[0];
+		stack.shift();
+		loading = false;
+		loadItem();
+		pub.fire("loaded", {
+			url: item,
+			length: stack.length
+		});
+	};
 
-    loadItem = function () {
-        //debug.info("Saga.StackLoader.loadItem() -> ", stack.length);
-        if (loading) {
-            debug.info("Saga.StackLoader.loadItem() -> Already loading, waiting...");
-            return;
-        }
+	loadItem = function () {
+		//debug.info("Saga.StackLoader.loadItem() -> ", stack.length);
+		if (loading) {
+			debug.info("Saga.StackLoader.loadItem() -> Already loading, waiting...");
+			return;
+		}
 
-        if (stack.length <= 0) {
-            debug.info("Saga.StackLoader.loadItem() -> Stack fully loaded!");
-            // event?@?!!?!
-            return;
-        }
+		if (stack.length <= 0) {
+			debug.info("Saga.StackLoader.loadItem() -> Stack fully loaded!");
+			// event?@?!!?!
+			return;
+		}
 
-        loading = true;
+		loading = true;
 
-        var file,
-            ext;
-       
-        if (u.isFunction(stack[0])) { // callback
-            stack[0]();
-            loadItemDone();
+		var file,
+			ext;
+
+		if (u.isFunction(stack[0])) { // callback
+			stack[0]();
+			loadItemDone();
 			//debug.log("Saga.StackLoader.loadItem() -> CALLBACKED", stack);
-        } else {
-            file = stack[0];
-			//debug.log("Saga.StackLoader.loadItem() ->", file);
-            ext = u.fileExtension(file);
-            if (ext === "js" || ext === "jst") {
-                loadJs(file, function (script) {
-                    loaded[file] = script;
-                    loadItemDone();
-                });
-            } else if (ext === "png" || ext === "gif" || ext === "jpg" || ext === "jpeg" || ext === "svg") {
-                loadImage(file, function (img) {
-                    loaded[file] = img;
-                    loadItemDone();
-                });
-            } else if (ext === "html") {
-                loadHtml(file, function (text) {
-                    loaded[file] = text;
-                    loadItemDone();
-                });
-            } else if (ext === "css") {
-                loadCss(file, function (node) {
-                    loaded[file] = node;
-                    loadItemDone();
-                });
-            }
-        }
-    };
+		} else {
+			file = stack[0];
+			debug.log("Saga.StackLoader.loadItem() ->", file);
+			ext = u.fileExtension(file);
+			if (ext === "js" || ext === "jst") {
+				loadJs(file, function (script) {
+					loaded[file] = script;
+					loadItemDone();
+				});
+			} else if (ext === "png" || ext === "gif" || ext === "jpg" || ext === "jpeg" || ext === "svg") {
+				loadImage(file, function (img) {
+					loaded[file] = img;
+					loadItemDone();
+				});
+			} else if (ext === "html") {
+				loadHtml(file, function (text) {
+					loaded[file] = text;
+					loadItemDone();
+				});
+			} else if (ext === "css") {
+				loadCss(file, function (node) {
+					loaded[file] = node;
+					loadItemDone();
+				});
+			} else {
+				loadHtml(file, function (text) {
+					loaded[file] = text;
+					loadItemDone();
+				});
+			}
+		}
+	};
 
-    load = function (stuff, cb) { // collection of urls
-        //debug.info("Saga.StackLoader.load() -> stuff: " + stuff);
-        if (u.isString(stuff)) {
-            stack.push(stuff);
-        } else {
-            u.each(stuff, function (item) {
-                stack.push(item);
-            });
-        }
-        stack.push(cb);
-        loadItem();
-    };
+	load = function (stuff, cb) { // collection of urls
+		debug.info("Saga.StackLoader.load() -> stuff: ", stuff);
+		if (u.isString(stuff)) {
+			stack.push(stuff);
+		} else {
+			u.each(stuff, function (item) {
+				stack.push(item);
+			});
+		}
+		stack.push(cb);
+		loadItem();
+	};
 
-    pub = {
-        load: function () {
-            load.apply(this, arguments);
-        },
-        dir: function () {
-            return loaded;
-        },
-		get: function(k){
-			if(loaded.hasOwnProperty(k)){
+	pub = {
+		load: function () {
+			load.apply(this, arguments);
+		},
+		dir: function () {
+			return loaded;
+		},
+		get: function (k) {
+			if (loaded.hasOwnProperty(k)) {
 				return loaded[k];
 			}
 		}
-    };
-    u.extend(pub, Saga.Event());
-    return pub;
+	};
+	u.extend(pub, Saga.Event());
+	return pub;
 };
 /*jslint browser:true*/
 /*global Saga */
@@ -2306,11 +2392,12 @@ Saga.Keyboard = (function () {
 			downKeys[evt.keyCode] = true;
 			pub.fire("key:down", evt);
 			if (usefulKeys.hasOwnProperty(evt.keyCode)) {
-				pub.fire(usefulKeys[evt.keyCode], evt);
-				debug.warn("Saga.Keyboard.keyDown() -> usefulKey: ", usefulKeys[evt.keyCode]);
 				if (downKeys[usefulKeyCodes.shift]) {
 					pub.fire("shift:" + usefulKeys[evt.keyCode], evt);
 					debug.warn("Saga.Keyboard.keyDown() -> SHIFT + usefulKey: ", usefulKeys[evt.keyCode]);
+				} else {
+					debug.warn("Saga.Keyboard.keyDown() -> usefulKey: ", usefulKeys[evt.keyCode]);
+					pub.fire(usefulKeys[evt.keyCode], evt);
 				}
 			}
 		},
