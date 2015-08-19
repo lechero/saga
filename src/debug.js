@@ -1,6 +1,12 @@
 /*jslint browser:true*/
 /*global Saga, console */
 
+/*
+TODO: add "trace" function
+TODO: add "image" function
+https://github.com/adriancooney/console.image/blob/master/console.image.js
+*/
+
 Saga.Debug = (function () {
 	"use strict";
 	var pub,

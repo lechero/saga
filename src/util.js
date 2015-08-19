@@ -32,6 +32,9 @@ Saga.Util = (function () {
 			}
 			return false;
 		},
+		difference = function (a, b) {
+			return Math.abs(a - b);
+		},
 		angleToPoint = function (point1, point2) {
 			var dy = point1.y - point2.y,
 				dx = point1.x - point2.x,
@@ -109,10 +112,13 @@ Saga.Util = (function () {
 			return prefix + String(Math.max.apply(null, arr) + 1);
 		};
 
+	pub.difference = function (a, b) {
+		return difference(a, b)
+	};
 	pub.call = function () {
 		//var arg = Array.prototype.slice.call(arguments, 0);
 		call.apply(this, arguments);
-	}
+	};
 	pub.fileExtension = function (str) {
 		return fileExtension(str);
 	};

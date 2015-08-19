@@ -12,6 +12,7 @@ Saga.Dom = (function () {
 		prefixBrowser = ["webkit", "moz", "MS", "o", ""],
 		//line.getAttributeNS(null, "class"
 		hasClassNS = function (element, className) {
+			//debug.log("hasClassNS", element, className);
 			var classes = element.getAttributeNS(null, "class") || "";
 			if (element && classes) {
 				return classes.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
@@ -19,12 +20,14 @@ Saga.Dom = (function () {
 			return false;
 		},
 		hasClass = function (element, className) {
+
 			if (element && element.className) {
 				return element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
 			}
 			return false;
 		},
 		addClassNs = function (element, className) {
+			//debug.log("addClassNs", element, className);
 			try {
 				var classes = element.getAttributeNS(null, "class") || "";
 				if (!hasClassNS(element, className)) {
@@ -36,13 +39,18 @@ Saga.Dom = (function () {
 			}
 		},
 		addClass = function (element, className) {
-			//console.trace("addClass", element, className);
+
+			if (!element) {
+				console.trace("addClass -> NO element", element, className);
+				return;
+			}
 			if (!hasClass(element, className)) {
 				element.className += " " + className;
 			}
 			return true;
 		},
 		removeClassNs = function (element, className) {
+			//debug.log("removeClassNs", element, className);
 			try {
 				var classes = element.getAttributeNS(null, "class") || "";
 				if (hasClassNS(element, className)) {

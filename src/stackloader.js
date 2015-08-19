@@ -28,9 +28,10 @@ Saga.StackLoader = function () {
 		loadImage = function (file, cb) {
 			var img = document.createElement('img');
 			img.onload = function () {
-				if (cb) {
-					cb(img);
-				}
+				u.call(cb, img);
+			};
+			img.onerror = function () {
+				u.call(cb, false);
 			};
 			img.src = file;
 		},
@@ -58,15 +59,22 @@ Saga.StackLoader = function () {
 			return script;
 		},
 		loadHtml = function (file, cb) {
-			var loadOptions = {
-				method: "get",
-				url: file,
-				success: function (result) {
-					if (cb) {
-						cb(result);
+			var cbError = function () {
+					debug.warn("Error! File: ", file, "NOT LOADED!");
+					u.call(cb, false);
+				},
+				loadOptions = {
+					method: "get",
+					url: file,
+					timeout: cbError,
+					abort: cbError,
+					error: cbError,
+					success: function (result) {
+						if (cb) {
+							cb(result);
+						}
 					}
-				}
-			};
+				};
 			loader.execute(loadOptions);
 		};
 
