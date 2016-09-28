@@ -17,6 +17,7 @@ Saga.Keyboard = (function () {
 			61: "plus",
 			173: "min",
 			16: "shift",
+			27: "esc",
 			49: "1",
 			50: "2",
 			51: "3",

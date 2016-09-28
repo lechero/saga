@@ -149,6 +149,7 @@ Saga.AssetManager = (function () {
             try {
                 asset.View.show(function () {
                     pub.fire(asset.name + ":shown");
+                    pub.fire("asset:shown", asset.name);
                 });
             } catch (err) {
                 pub.fire(asset.name + ":shown");
