@@ -2426,7 +2426,7 @@ Saga.Keyboard = (function () {
 					pub.fire("shift:" + usefulKeys[evt.keyCode], evt);
 					debug.warn("Saga.Keyboard.keyDown() -> SHIFT + usefulKey: ", usefulKeys[evt.keyCode]);
 				} else {
-					debug.warn("Saga.Keyboard.keyDown() -> usefulKey", ":"+usefulKeys[evt.keyCode]+":");
+					debug.warn("Saga.Keyboard.keyDown() -> usefulKey: ", usefulKeys[evt.keyCode]);
 					pub.fire(usefulKeys[evt.keyCode], evt);
 				}
 			}
