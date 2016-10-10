@@ -2820,12 +2820,23 @@ Saga.Panorama = function (containerDiv, opts) {
 
             zoomUpdate(obj);
 
-            oTween = TweenLite.to(center, time, {
-                css: {
-                    autoAlpha: obj.opacityTo
-                },
-                ease: Linear.easeNone
+            debug.warn("Saga.Panorama.zoomIn", drawnFaces);
+
+            u.each(drawnFaces, function (face) {
+               oTween = TweenLite.to(face, time, {
+                    css: {
+                        autoAlpha: obj.opacityTo
+                    },
+                    ease: Linear.easeNone
+                });
             });
+
+            // oTween = TweenLite.to(center, time, {
+            //     css: {
+            //         autoAlpha: obj.opacityTo
+            //     },
+            //     ease: Linear.easeNone
+            // });
 
             ////debug.error(containerDiv.id + " -> " + "Saga.Panorama.zoomIn() TWEEEN START");
             tween = TweenLite.to(obj, time, {
@@ -2853,21 +2864,31 @@ Saga.Panorama = function (containerDiv, opts) {
                 },
                 time = duration / 1000;
 
-            TweenLite.set(center, {
-                css: {
-                    autoAlpha: obj.opacity
-                }
+            // TweenLite.set(center, {
+            //     css: {
+            //         autoAlpha: obj.opacity
+            //     }
+            // });
+
+            u.each(drawnFaces, function (face) {
+               TweenLite.set(face, {
+                    css: {
+                        autoAlpha: obj.opacity
+                    }
+                });
             });
 
             ////debug.error(containerDiv.id + " -> " + "Saga.Panorama.zoomOut()");
             zoomUpdate(obj);
 
-            oTween = TweenLite.to(center, time, {
-                css: {
-                    autoAlpha: obj.opacityTo
-                },
-                ease: Linear.easeNone,
-                onComplete: cb
+            u.each(drawnFaces, function (face) {
+                oTween = TweenLite.to(face, time, {
+                    css: {
+                        autoAlpha: obj.opacityTo
+                    },
+                    ease: Linear.easeNone,
+                    onComplete: cb
+                });
             });
             ////debug.error(containerDiv.id + " -> " + "Saga.Panorama.zoomOut() TWEEEN START");
             tween = TweenLite.to(obj, time, {
@@ -3113,6 +3134,8 @@ Saga.Panorama = function (containerDiv, opts) {
             element.className = "cubemapface " + face + "face";
             center.appendChild(element);
 
+            drawnFaces.push(element);
+
             // translateY(-255.6px) rotateX(90deg) rotateY(180deg) rotateZ(90deg) scaleY(-1) scaleX(-1);
 
             halfsize = size * 0.5 - border_margin;
@@ -3175,6 +3198,10 @@ Saga.Panorama = function (containerDiv, opts) {
         },
         load = function (pano, angle, cb) {
             panoImg = pano;
+
+            // TODO: kill the drawn faces
+            drawnFaces = [];
+
             //////////debug.error("Saga.Panorama.load()", "yaw:" + yaw, "pano: " + pano, "angle: " + angle, "angleOffset: " + angleOffset);
             transitionTime(center, 0);
             var done = 0,
