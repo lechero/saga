@@ -3310,7 +3310,6 @@ Saga.Panorama = function (containerDiv, opts) {
             cube.removeEventListener("touchstart", onDown);
         };
 
-
     updateFaces = function () {
         var distance = perspective,
             rect,
