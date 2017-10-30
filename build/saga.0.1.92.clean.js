@@ -3391,6 +3391,7 @@ Saga.Panorama = function (containerDiv, opts) {
         center.style.transform = transform;
         center.style.webkitTransform = transform;
         //center.style.mozTransform = transform;
+        center.style.display = "inline-block";
 
         //tfTest();
 
