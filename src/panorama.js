@@ -201,7 +201,7 @@ Saga.Panorama = function (containerDiv, opts) {
         zoomIn = function (duration, cb) {
 
             var obj = {
-                    opacity: 0.5,
+                    opacity: 0,
                     opacityFrom: 0,
                     opacityTo: 1,
                     distance: 0.5,
@@ -252,7 +252,7 @@ Saga.Panorama = function (containerDiv, opts) {
                     opacityTo: 0,
                     distance: 1,
                     distanceFrom: 1,
-                    distanceTo: 2
+                    distanceTo: 1.2
                 },
                 time = duration / 1000;
 
@@ -425,7 +425,7 @@ Saga.Panorama = function (containerDiv, opts) {
 
             tween = TweenLite.to(obj, duration / 1000, {
                 rotateY: obj.rotateYTo,
-                ease: Linear.easeNone,
+                ease: Power2.easeInOut,
                 onUpdate: rotatePanorama,
                 onComplete: cb
             });
